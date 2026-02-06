@@ -88,19 +88,6 @@ docker exec mikr-manager node scripts/seed.js
 
 **Important:** `ENCRYPTION_KEY` must be exactly 64 hex characters. Device passwords are encrypted with this key — if changed, existing passwords won't decrypt.
 
-## Deploy from Source
-
-```bash
-git clone https://github.com/hreskiv/mikr.git
-cd mikr
-
-# Deploy to remote server (builds on server)
-./scripts/deploy.sh <host> [user] [port]
-# Default: root@host:22 → /opt/mikr
-```
-
-The deploy script: rsync → build image → push to ghcr.io → save tar.gz → docker compose up → seed.
-
 ## Data & Backup
 
 SQLite database stored in `./data/mikr.db`. Persists across container updates.
