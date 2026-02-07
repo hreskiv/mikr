@@ -10,6 +10,8 @@ Web-based MikroTik device management system. Monitor, configure, and upgrade you
 - **RouterOS & firmware upgrades** — with live WebSocket progress
 - **Config backup** — export with side-by-side diff comparison
 - **Network scanning** — discover MikroTik devices in IP ranges
+- **Interface ports** — physical port visualization with link speed colors, PoE status
+- **Neighbor discovery** — MNDP/LLDP/CDP neighbors with links to managed devices
 - **Route counting** — per-protocol breakdown (BGP, OSPF, static, connected)
 - **User management** — role-based access (admin / operator / viewer)
 - **SSH & REST API** — dual connection method support per device
@@ -51,6 +53,13 @@ docker exec mikr-manager node scripts/seed.js
 ```
 
 Open `http://<host>:3000`, login: **admin** / **admin**
+
+> **Production:** Change the default password immediately. Create a dedicated MikroTik user group with only the required policies instead of using `admin` with full access:
+> ```
+> /user/group/add name=mikr-manager policy=read,write,ssh,rest-api,sensitive,reboot
+> /user/add name=mikr group=mikr-manager password=YOUR_PASSWORD
+> ```
+> This limits the blast radius if the manager is compromised.
 
 ## Without Docker Compose
 
