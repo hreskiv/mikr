@@ -56,8 +56,8 @@ Open `http://<host>:3000`, login: **admin** / **admin**
 
 > **Production:** Change the default password immediately. Create a dedicated MikroTik user group with only the required policies instead of using `admin` with full access:
 > ```
-> /user/group/add name=mikr-manager policy=read,write,ssh,rest-api,sensitive,reboot
-> /user/add name=mikr group=mikr-manager password=YOUR_PASSWORD
+> /user/group/add name=manager-group policy=ssh,reboot,read,write,sensitive,rest-api,!local,!telnet,!ftp,!policy,!test,!winbox,!password,!web,!sniff,api,!romon
+> /user/add name=mikr group=manager-group password=YOUR_PASSWORD
 > ```
 > This limits the blast radius if the manager is compromised.
 
