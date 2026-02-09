@@ -1,6 +1,6 @@
 # MikroTik Manager
 
-Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your routers from a single dashboard with real-time WebSocket updates.
+Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your devices from a single dashboard with real-time WebSocket updates.
 
 [![Version](https://img.shields.io/badge/version-1.4.0-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
@@ -136,7 +136,7 @@ docker exec mikr-manager node scripts/seed.js
 | CLI commands | ✓ | ✓ | — |
 | RouterOS upgrades | ✓ | ✓ | — |
 | Config backup | ✓ | ✓ | — |
-| Interface details | ✓ | ✓ | — |
+| Interface details | ✓ | ✓ | ✓ |
 | Self-signed TLS | N/A | ✓ | N/A |
 | Session overhead | 1 SSH conn | HTTPS per request | UDP per poll |
 
@@ -150,11 +150,11 @@ Devices can use SSH or REST as primary method, with SNMP as an optional suppleme
 
 All features are available on every tier — the only difference is the device limit.
 
-| | Free | Pro | Enterprise |
-|---|------|-----|------------|
+| | Community | License 50 | License Unlimited |
+|---|-----------|------------|------------------|
 | **Devices** | up to 10 | up to 50 | Unlimited |
-| **Price** | $0 | $199 (one-time) | $499 (one-time) |
-| **Updates** | — | $49/year (optional) | $99/year (optional) |
+| **Price** | €0 | €149 (one-time) | €399 (one-time) |
+| **Updates** | — | €49/year (optional) | €99/year (optional) |
 | **All features** | ✓ | ✓ | ✓ |
 
 - **Perpetual license** — the software works forever on the purchased version
