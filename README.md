@@ -1,21 +1,52 @@
 # MikroTik Manager
 
-Web-based MikroTik device management system. Monitor, configure, and upgrade your MikroTik fleet from a single dashboard.
+Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your routers from a single dashboard with real-time WebSocket updates.
+
+[![Version](https://img.shields.io/badge/version-1.4.0-blue)](https://github.com/hreskiv/mikr/releases)
+[![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
+
+## Screenshots
+
+<!-- TODO: add screenshots -->
+*Screenshots coming soon — dashboard, device detail with port visualization, command execution, config diff comparison.*
 
 ## Features
 
-- **Dashboard** — real-time device status monitoring (polling every 60s)
-- **Device management** — add, edit, delete, group by sites
-- **Bulk commands** — execute CLI commands on multiple devices simultaneously
-- **RouterOS & firmware upgrades** — with live WebSocket progress
-- **Config backup** — export with side-by-side diff comparison
-- **Network scanning** — discover MikroTik devices in IP ranges
-- **Interface ports** — physical port visualization with link speed colors, PoE status
-- **Neighbor discovery** — MNDP/LLDP/CDP neighbors with links to managed devices
-- **Route counting** — per-protocol breakdown (BGP, OSPF, static, connected)
-- **User management** — role-based access (admin / operator / viewer)
-- **SSH & REST API** — dual connection method support per device
-- **Dark / Light theme**
+### Monitoring
+- **Real-time dashboard** — device status cards with WebSocket live updates (60s polling)
+- **SNMP monitoring** — lightweight SNMPv2c polling (CPU, memory, uptime, temperature, voltage)
+- **Three connection methods** — SSH, REST API, or SNMP-only per device
+- **SNMP as supplementary** — SSH/REST devices can also use SNMP for faster status checks
+
+### Device Management
+- **Site grouping** — organize devices by physical location
+- **Bulk editing** — select multiple devices, change connection parameters in one action
+- **Enable/disable** — disabled devices skip monitoring, dimmed in UI
+- **Import from scan** — discover and add devices from network scan results
+
+### Operations
+- **Bulk CLI commands** — execute on multiple devices with live WebSocket output
+- **RouterOS upgrades** — check for updates + upgrade with real-time progress
+- **Firmware upgrades** — write firmware + automatic reboot
+- **Config backup & export** — save device configurations to database
+- **Side-by-side diff** — compare any two backups visually
+- **Backup scheduling** — automated exports at 6h / 12h / 24h / 3d / 7d intervals
+
+### Network Discovery
+- **IP range scanning** — CIDR, dash ranges, single IP (probes SSH + HTTPS + HTTP)
+- **Neighbor discovery** — MNDP / LLDP / CDP with clickable links to managed devices
+- **MAC→IPv4 cross-reference** — resolves link-local IPv6 neighbors to real addresses
+
+### Visualization
+- **Physical port grid** — colored squares by link speed (10M / 100M / 1G / 10G)
+- **PoE indicators** — lightning bolt icon with power, voltage, current in tooltip
+- **Route counting** — per-protocol breakdown (static, connected, BGP, OSPF, RIP, etc.)
+
+### Security & Access
+- **Role-based access** — admin / operator / viewer
+- **JWT authentication** — access token (15min) + refresh token (7d)
+- **Encrypted passwords** — AES-256-GCM for stored device credentials
+- **Dark / Light theme** — toggle in sidebar, persisted in localStorage
 
 ## Quick Start
 
@@ -97,6 +128,42 @@ docker exec mikr-manager node scripts/seed.js
 
 **Important:** `ENCRYPTION_KEY` must be exactly 64 hex characters. Device passwords are encrypted with this key — if changed, existing passwords won't decrypt.
 
+## Connection Methods
+
+| Capability | SSH | REST API | SNMP |
+|------------|-----|----------|------|
+| Status monitoring | ✓ | ✓ | ✓ |
+| CLI commands | ✓ | ✓ | — |
+| RouterOS upgrades | ✓ | ✓ | — |
+| Config backup | ✓ | ✓ | — |
+| Interface details | ✓ | ✓ | — |
+| Self-signed TLS | N/A | ✓ | N/A |
+| Session overhead | 1 SSH conn | HTTPS per request | UDP per poll |
+
+- **SSH** — interactive shell, best compatibility with all RouterOS versions
+- **REST API** — available on RouterOS 7.1+, supports HTTPS and HTTP
+- **SNMP** — monitoring only (no commands, upgrades, or backups). Useful for devices where SSH/REST isn't available
+
+Devices can use SSH or REST as primary method, with SNMP as an optional supplementary source for faster status checks.
+
+## Licensing
+
+All features are available on every tier — the only difference is the device limit.
+
+| | Free | Pro | Enterprise |
+|---|------|-----|------------|
+| **Devices** | up to 10 | up to 50 | Unlimited |
+| **Price** | $0 | $199 (one-time) | $499 (one-time) |
+| **Updates** | — | $49/year (optional) | $99/year (optional) |
+| **All features** | ✓ | ✓ | ✓ |
+
+- **Perpetual license** — the software works forever on the purchased version
+- **Update subscription** — grants access to new versions (optional, not required)
+- **Self-hosted** — your data stays on your server, offline license activation
+- No account required, no phone-home, no telemetry
+
+> During the beta period, all installations run with unlimited access.
+
 ## Data & Backup
 
 SQLite database stored in `./data/mikr.db`. Persists across container updates.
@@ -125,6 +192,6 @@ docker compose up -d         # Start / update
 - **Frontend**: Vanilla JS SPA (no framework), CSS3
 - **Real-time**: WebSocket for live status, command output, upgrade progress
 - **Auth**: JWT + bcrypt, role-based (admin / operator / viewer)
-- **MikroTik**: SSH (node-ssh) + REST API (https module)
+- **MikroTik**: SSH (node-ssh) + REST API (https module) + SNMP (net-snmp)
 - **Encryption**: AES-256-GCM for stored device passwords
 - **Container**: Docker, node:22-alpine (multi-stage build)
