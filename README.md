@@ -2,7 +2,7 @@
 
 Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your devices from a single dashboard with real-time WebSocket updates.
 
-[![Version](https://img.shields.io/badge/version-1.5.4-blue)](https://github.com/hreskiv/mikr/releases)
+[![Version](https://img.shields.io/badge/version-1.5.5-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
 
 ## Screenshots
@@ -142,7 +142,7 @@ docker exec mikr-manager node scripts/seed.js
 | Self-signed TLS | N/A | ✓ | N/A |
 | Session overhead | 1 SSH conn | HTTPS per request | UDP per poll |
 
-- **SSH** — interactive shell, best compatibility with all RouterOS versions
+- **SSH** — non-interactive exec, best compatibility with all RouterOS versions
 - **REST API** — available on RouterOS 7.1+, supports HTTPS and HTTP
 - **SNMP** — monitoring only (no commands, upgrades, or backups). Useful for devices where SSH/REST isn't available
 
