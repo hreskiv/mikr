@@ -2,7 +2,7 @@
 
 Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your devices from a single dashboard with real-time WebSocket updates.
 
-[![Version](https://img.shields.io/badge/version-1.5.7-blue)](https://github.com/hreskiv/mikr/releases)
+[![Version](https://img.shields.io/badge/version-1.5.8-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
 
 ## Screenshots
@@ -46,6 +46,7 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 - **DHCP leases** — view all leases with IP, MAC, hostname, status badges, and expiry time
 - **Wireless clients** — connected clients with signal strength, TX/RX rates, uptime, and IP from DHCP
 - **Auto-refresh** — DHCP and wireless tables update every 30s while visible, disconnected clients disappear automatically
+- **IP services** — see all MikroTik services (SSH, API, WWW, Winbox, FTP) as colored pills, toggle enable/disable with safety checks
 - **Route counting** — per-protocol breakdown (static, connected, BGP, OSPF, RIP, etc.)
 
 ### Security & Access
@@ -150,7 +151,7 @@ docker exec mikr-manager node scripts/seed.js
 - **REST API** — available on RouterOS 7.1+, supports HTTPS and HTTP
 - **SNMP** — monitoring only (no commands, upgrades, or backups). Useful for devices where SSH/REST isn't available
 
-Devices can use SSH or REST as primary method, with SNMP as an optional supplementary source for faster status checks.
+Devices can use SSH or REST as primary method, with SNMP as an optional supplementary source for faster status checks. The device detail page detects available methods from actual service data and allows quick switching between them.
 
 ## Licensing
 
