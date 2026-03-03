@@ -2,7 +2,7 @@
 
 Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your devices from a single dashboard with real-time WebSocket updates.
 
-[![Version](https://img.shields.io/badge/version-1.5.9-blue)](https://github.com/hreskiv/mikr/releases)
+[![Version](https://img.shields.io/badge/version-1.6.0-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
 
 ## Screenshots
@@ -13,7 +13,7 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 ## Features
 
 ### Monitoring
-- **Real-time dashboard** — device status cards with WebSocket live updates (60s polling)
+- **Real-time dashboard** — device status cards with WebSocket live updates (60s polling, configurable per device)
 - **SNMP monitoring** — lightweight SNMPv2c polling (CPU, memory, uptime, temperature, voltage)
 - **Three connection methods** — SSH, REST API, or SNMP-only per device
 - **SNMP as supplementary** — SSH/REST devices can also use SNMP for faster status checks
@@ -50,6 +50,7 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 - **Route counting** — per-protocol breakdown (static, connected, BGP, OSPF, RIP, etc.)
 
 ### Security & Access
+- **HTTPS / TLS** — optional HTTPS server on port 3443; auto-generated self-signed cert or bring your own; HTTP and HTTPS run in parallel; WebSocket (WSS) works automatically over HTTPS
 - **Role-based access** — admin / operator / viewer
 - **JWT authentication** — access token (15min) + refresh token (7d)
 - **Encrypted passwords** — AES-256-GCM for stored device credentials
@@ -73,6 +74,7 @@ services:
     restart: unless-stopped
     ports:
       - "3000:3000"
+      - "3443:3443"    # HTTPS (optional, requires TLS_ENABLED=true)
     volumes:
       - ./data:/app/data
     environment:
@@ -132,6 +134,10 @@ docker exec mikr-manager node scripts/seed.js
 | `LOG_LEVEL` | No | `info` | Log level |
 | `MONITOR_INTERVAL_MS` | No | `60000` | Device polling interval (ms) |
 | `MONITOR_CONCURRENCY` | No | `10` | Parallel device checks |
+| `TLS_ENABLED` | No | `false` | Enable HTTPS server |
+| `HTTPS_PORT` | No | `3443` | HTTPS server port |
+| `TLS_CERT_PATH` | No | auto-generated | Path to custom TLS certificate (PEM) |
+| `TLS_KEY_PATH` | No | auto-generated | Path to custom TLS private key (PEM) |
 
 **Important:** `ENCRYPTION_KEY` must be exactly 64 hex characters. Device passwords are encrypted with this key — if changed, existing passwords won't decrypt.
 
