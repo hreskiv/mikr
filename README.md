@@ -2,7 +2,7 @@
 
 Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your devices from a single dashboard with real-time WebSocket updates.
 
-[![Version](https://img.shields.io/badge/version-1.6.1-blue)](https://github.com/hreskiv/mikr/releases)
+[![Version](https://img.shields.io/badge/version-1.7.0-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
 
 ## Screenshots
@@ -46,6 +46,8 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 - **DHCP leases** — view all leases with IP, MAC, hostname, status badges, and expiry time
 - **Wireless clients** — connected clients with signal strength, TX/RX rates, uptime, and IP from DHCP
 - **Auto-refresh** — DHCP and wireless tables update every 30s while visible, disconnected clients disappear automatically
+- **IPsec tunnels** — configured peers with established/not established state, traffic counters, uptime
+- **WireGuard peers** — endpoint, last handshake (color-coded by recency), TX/RX counters
 - **IP services** — see all MikroTik services (SSH, API, WWW, Winbox, FTP) as colored pills, toggle enable/disable with safety checks
 - **Route counting** — per-protocol breakdown (static, connected, BGP, OSPF, RIP, etc.)
 
