@@ -2,7 +2,7 @@
 
 Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your devices from a single dashboard with real-time WebSocket updates.
 
-[![Version](https://img.shields.io/badge/version-1.9.1-blue)](https://github.com/hreskiv/mikr/releases)
+[![Version](https://img.shields.io/badge/version-1.9.3-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
 
 ## Screenshots
@@ -98,7 +98,7 @@ Open `http://<host>:3000`, login: **admin** / **admin**
 
 > **Production:** Change the default password immediately. Create a dedicated MikroTik user group with only the required policies instead of using `admin` with full access:
 > ```
-> /user/group/add name=manager-group policy=ssh,reboot,read,write,sensitive,rest-api,!local,!telnet,!ftp,!policy,!test,!winbox,!password,!web,!sniff,api,!romon
+> /user/group/add name=manager-group policy=ssh,reboot,read,write,sensitive,rest-api,policy,!local,!telnet,!ftp,!test,!winbox,!password,!web,!sniff,api,!romon
 > /user/add name=mikr group=manager-group password=YOUR_PASSWORD
 > ```
 > This limits the blast radius if the manager is compromised.
