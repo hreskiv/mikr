@@ -195,8 +195,6 @@ All features are available on every tier — the only difference is the device l
 - **Self-hosted** — your data stays on your server, offline license activation
 - No account required, no phone-home, no telemetry
 
-> During the beta period, all installations run with unlimited access.
-
 ## Data & Backup
 
 SQLite database stored in `./data/mikr.db`. Persists across container updates.
