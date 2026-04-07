@@ -7,8 +7,26 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 
 ## Screenshots
 
-<!-- TODO: add screenshots -->
-*Screenshots coming soon — dashboard, device detail with port visualization, command execution, config diff comparison.*
+<p align="center">
+  <img src="screenshots/screenshot.png" alt="Dashboard — device status grouped by site" width="100%">
+</p>
+
+<details>
+<summary>More screenshots</summary>
+
+<p align="center">
+  <img src="screenshots/screenshot-device-detail.png" alt="Device detail — interfaces, PoE, neighbors" width="100%">
+</p>
+
+<p align="center">
+  <img src="screenshots/screenshot-upgrades.png" alt="Upgrades — sequential queue, version badges" width="100%">
+</p>
+
+<p align="center">
+  <img src="screenshots/screenshot-backups.png" alt="Backups — side-by-side config diff" width="100%">
+</p>
+
+</details>
 
 ## Features
 
