@@ -2,7 +2,7 @@
 
 Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your devices from a single dashboard with real-time WebSocket updates.
 
-[![Version](https://img.shields.io/badge/version-1.16.1-blue)](https://github.com/hreskiv/mikr/releases)
+[![Version](https://img.shields.io/badge/version-1.16.2-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
 
 ## Screenshots
@@ -51,6 +51,15 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 - **Side-by-side diff** — compare any two backups visually
 - **Backup scheduling** — automated exports with time-of-day selection and flexible intervals (2h to 7d)
 
+### Logging & Observability
+- **Built-in syslog receiver** — the Manager ships a UDP listener (default `:5514`) that ingests MikroTik syslog messages, persists them to SQLite, and streams them live to the UI over WebSocket. No separate log server needed.
+- **Native RouterOS format** — topics and messages appear exactly as in `/log print` (works out of the box with `remote-log-format=default`; also accepts `<PRI>`-prefixed and `bsd-syslog=yes` RFC3164 forms)
+- **Unified Logs page** — all devices in one stream with colored severity stripe, filters (device, severity, topic, text search), time range selector (`All time` / `Last 1h` / `6h` / `24h` / `7d`), **Load older** pagination, pause and auto-scroll
+- **Per-device Logs tab** — focused view on the device detail page for troubleshooting a specific router
+- **Multi-IP device correlation** — logs are matched to the right device by **any** interface IP (collected each monitor poll), so the syslog source IP doesn't need to equal the management IP and `src-address=` pinning is optional
+- **Per-device retention override** — raise the row cap on chatty core/border routers, lower it on quiet APs, so a log-storm on one device can't evict logs from the rest of the fleet
+- **Setup Guide modal** — one click generates a copy-paste MikroTik CLI snippet and an optional **Command Template** to apply the config to every device at once
+
 ### Network Discovery
 - **IP range scanning** — CIDR, dash ranges, single IP (probes SSH + HTTPS + HTTP)
 - **Neighbor discovery** — MNDP / LLDP / CDP with clickable links to managed devices
@@ -95,6 +104,7 @@ services:
     ports:
       - "3000:3000"
       - "3443:3443"    # HTTPS (optional, requires TLS_ENABLED=true)
+      - "5514:5514/udp"  # Syslog receiver (optional — omit if not using the Logs page)
     volumes:
       - ./data:/app/data
     environment:
@@ -131,6 +141,7 @@ docker run -d \
   --name mikr-manager \
   --restart unless-stopped \
   -p 3000:3000 \
+  -p 5514:5514/udp \
   -v /opt/mikr/data:/app/data \
   -e PORT=3000 \
   -e HOST=0.0.0.0 \
@@ -158,6 +169,10 @@ docker exec mikr-manager node scripts/seed.js
 | `HTTPS_PORT` | No | `3443` | HTTPS server port |
 | `TLS_CERT_PATH` | No | auto-generated | Path to custom TLS certificate (PEM) |
 | `TLS_KEY_PATH` | No | auto-generated | Path to custom TLS private key (PEM) |
+| `SYSLOG_ENABLED` | No | `true` | Enable the built-in UDP syslog receiver |
+| `SYSLOG_PORT` | No | `5514` | UDP port for the syslog listener |
+| `SYSLOG_RETENTION_DAYS` | No | `7` | Drop log rows older than this many days |
+| `SYSLOG_MAX_ROWS_PER_DEVICE` | No | `10000` | Global per-device row cap (overridable per device in the UI) |
 
 **Important:** `ENCRYPTION_KEY` must be exactly 64 hex characters. Device passwords are encrypted with this key — if changed, existing passwords won't decrypt.
 
