@@ -59,6 +59,7 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 - **Multi-IP device correlation** — logs are matched to the right device by **any** interface IP (collected each monitor poll), so the syslog source IP doesn't need to equal the management IP and `src-address=` pinning is optional
 - **Per-device retention override** — raise the row cap on chatty core/border routers, lower it on quiet APs, so a log-storm on one device can't evict logs from the rest of the fleet
 - **Setup Guide modal** — one click generates a copy-paste MikroTik CLI snippet and an optional **Command Template** to apply the config to every device at once
+- **On-device syslog + RouterOS `dstnat` (if running mikr inside a MikroTik Container App)** — see the full install guide at [mikr.app/install.html#container](https://mikr.app/install.html#container)
 
 ### Network Discovery
 - **IP range scanning** — CIDR, dash ranges, single IP (probes SSH + HTTPS + HTTP)
@@ -86,6 +87,8 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 - **Dark / Light theme** — toggle in sidebar, persisted in localStorage
 
 ## Quick Start
+
+> **Full install guide**, including how to deploy on a **MikroTik Container App** and configure the **RouterOS `dstnat` rule for UDP 5514** (syslog): see [mikr.app/install.html](https://mikr.app/install.html).
 
 ```bash
 # Pull image
