@@ -2,7 +2,7 @@
 
 Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your devices from a single dashboard with real-time WebSocket updates.
 
-[![Version](https://img.shields.io/badge/version-1.16.4-blue)](https://github.com/hreskiv/mikr/releases)
+[![Version](https://img.shields.io/badge/version-1.16.5-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
 
 ## Screenshots
@@ -114,8 +114,11 @@ services:
       - PORT=3000
       - HOST=0.0.0.0
       - STORAGE_ADAPTER=sqlite
-      - JWT_SECRET=change-me-to-a-long-random-string
-      - ENCRYPTION_KEY=0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+      # JWT_SECRET and ENCRYPTION_KEY are auto-generated on first start and saved
+      # to ./data/.secrets.json (mode 0600). Back up the data/ directory!
+      # Override here if you want to set your own:
+      # - JWT_SECRET=$(openssl rand -hex 48)
+      # - ENCRYPTION_KEY=$(openssl rand -hex 32)
 EOF
 
 # Start
@@ -149,9 +152,10 @@ docker run -d \
   -e PORT=3000 \
   -e HOST=0.0.0.0 \
   -e STORAGE_ADAPTER=sqlite \
-  -e JWT_SECRET=$(openssl rand -hex 32) \
-  -e ENCRYPTION_KEY=$(openssl rand -hex 32) \
   ghcr.io/hreskiv/mikr:latest
+# JWT_SECRET and ENCRYPTION_KEY are auto-generated and persisted to
+# /opt/mikr/data/.secrets.json on first start. To use your own values,
+# pass: -e JWT_SECRET=$(openssl rand -hex 48) -e ENCRYPTION_KEY=$(openssl rand -hex 32)
 
 docker exec mikr-manager node scripts/seed.js
 ```
@@ -160,8 +164,8 @@ docker exec mikr-manager node scripts/seed.js
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `JWT_SECRET` | Yes | `dev-secret-change-me` | JWT signing key (min 32 chars) |
-| `ENCRYPTION_KEY` | Yes | built-in default | 64 hex chars (32 bytes). Generate: `openssl rand -hex 32` |
+| `JWT_SECRET` | No | auto-generated | Auto-generated on first start, persisted to `data/.secrets.json`. Override by setting env. Generate your own: `openssl rand -hex 48` |
+| `ENCRYPTION_KEY` | No | auto-generated | 64 hex chars (32 bytes). Same auto-gen + persist as `JWT_SECRET`. Generate your own: `openssl rand -hex 32` |
 | `PORT` | No | `3000` | Server port |
 | `HOST` | No | `0.0.0.0` | Bind address |
 | `STORAGE_ADAPTER` | No | `sqlite` | Storage backend |
@@ -177,7 +181,7 @@ docker exec mikr-manager node scripts/seed.js
 | `SYSLOG_RETENTION_DAYS` | No | `7` | Drop log rows older than this many days |
 | `SYSLOG_MAX_ROWS_PER_DEVICE` | No | `10000` | Global per-device row cap (overridable per device in the UI) |
 
-**Important:** `ENCRYPTION_KEY` must be exactly 64 hex characters. Device passwords are encrypted with this key — if changed, existing passwords won't decrypt.
+**Important:** If you rely on auto-generated secrets, **back up `data/.secrets.json`** alongside the SQLite database. Losing it invalidates all sessions and makes stored device passwords unrecoverable. `ENCRYPTION_KEY` must be exactly 64 hex characters — if changed after devices are added, existing encrypted passwords won't decrypt.
 
 ## Connection Methods
 
