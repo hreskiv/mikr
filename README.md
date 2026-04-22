@@ -2,7 +2,7 @@
 
 Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your devices from a single dashboard with real-time WebSocket updates.
 
-[![Version](https://img.shields.io/badge/version-1.16.6-blue)](https://github.com/hreskiv/mikr/releases)
+[![Version](https://img.shields.io/badge/version-1.16.7-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
 
 ## Screenshots
@@ -52,7 +52,7 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 - **Backup scheduling** — automated exports with time-of-day selection and flexible intervals (2h to 7d)
 
 ### Logging & Observability
-- **Built-in syslog receiver** — the Manager ships a UDP listener (default `:5514`) that ingests MikroTik syslog messages, persists them to SQLite, and streams them live to the UI over WebSocket. No separate log server needed.
+- **Built-in syslog receiver (UDP + TCP)** — the Manager ships both UDP and TCP listeners on port `5514` that ingest MikroTik syslog messages, persist them to SQLite, and stream live to the UI over WebSocket. TCP is useful when UDP is blocked by firewalls or when you want guaranteed delivery — RouterOS 7.x supports `Remote Log Protocol: TCP` natively.
 - **Native RouterOS format** — topics and messages appear exactly as in `/log print` (works out of the box with `remote-log-format=default`; also accepts `<PRI>`-prefixed and `bsd-syslog=yes` RFC3164 forms)
 - **Unified Logs page** — all devices in one stream with colored severity stripe, filters (device, severity, topic, text search), time range selector (`All time` / `Last 1h` / `6h` / `24h` / `7d`), **Load older** pagination, pause and auto-scroll
 - **Per-device Logs tab** — focused view on the device detail page for troubleshooting a specific router
@@ -107,7 +107,8 @@ services:
     ports:
       - "3000:3000"
       - "3443:3443"    # HTTPS (optional, requires TLS_ENABLED=true)
-      - "5514:5514/udp"  # Syslog receiver (optional — omit if not using the Logs page)
+      - "5514:5514/udp"  # Syslog UDP (optional — omit if not using the Logs page)
+      - "5514:5514/tcp"  # Syslog TCP (optional — useful when UDP is blocked)
     volumes:
       - ./data:/app/data
     environment:
@@ -148,6 +149,7 @@ docker run -d \
   --restart unless-stopped \
   -p 3000:3000 \
   -p 5514:5514/udp \
+  -p 5514:5514/tcp \
   -v /opt/mikr/data:/app/data \
   -e PORT=3000 \
   -e HOST=0.0.0.0 \
@@ -178,6 +180,8 @@ docker exec mikr-manager node scripts/seed.js
 | `TLS_KEY_PATH` | No | auto-generated | Path to custom TLS private key (PEM) |
 | `SYSLOG_ENABLED` | No | `true` | Enable the built-in UDP syslog receiver |
 | `SYSLOG_PORT` | No | `5514` | UDP port for the syslog listener |
+| `SYSLOG_TCP_ENABLED` | No | `true` | Enable the built-in TCP syslog receiver (parallel to UDP) |
+| `SYSLOG_TCP_PORT` | No | `5514` | TCP port for the syslog listener (defaults to `SYSLOG_PORT`) |
 | `SYSLOG_RETENTION_DAYS` | No | `7` | Drop log rows older than this many days |
 | `SYSLOG_MAX_ROWS_PER_DEVICE` | No | `10000` | Global per-device row cap (overridable per device in the UI) |
 
