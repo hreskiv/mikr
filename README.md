@@ -83,6 +83,7 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 - **HTTPS / TLS** — optional HTTPS server on port 3443; auto-generated self-signed cert or bring your own; HTTP and HTTPS run in parallel; WebSocket (WSS) works automatically over HTTPS
 - **Role-based access** — admin / operator / viewer
 - **JWT authentication** — access token (15min) + refresh token (7d)
+- **Two-factor authentication (TOTP)** — opt-in per user, RFC 6238 compatible with Google Authenticator / Authy / 1Password / Microsoft Authenticator; AES-256-GCM-encrypted secrets; 8 single-use backup codes; admin reset for lost devices
 - **Encrypted passwords** — AES-256-GCM for stored device credentials
 - **Dark / Light theme** — toggle in sidebar, persisted in localStorage
 
