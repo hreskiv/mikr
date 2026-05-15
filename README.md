@@ -2,7 +2,7 @@
 
 Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your devices from a single dashboard with real-time WebSocket updates.
 
-[![Version](https://img.shields.io/badge/version-1.21.0-blue)](https://github.com/hreskiv/mikr/releases)
+[![Version](https://img.shields.io/badge/version-1.22.0-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
 
 ## Screenshots
@@ -83,6 +83,7 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 - **HTTPS / TLS** — optional HTTPS server on port 3443; auto-generated self-signed cert or bring your own; HTTP and HTTPS run in parallel; WebSocket (WSS) works automatically over HTTPS
 - **Role-based access** — admin / operator / viewer
 - **JWT authentication** — access token (15min) + refresh token (7d)
+- **RouterOS CVE alerting** — each device's RouterOS version is matched daily against the public NVD vulnerability feed. Dedicated **Security** page with severity/site filters, a per-device Security Advisories card, a `N CVE` badge on device cards, and a High/Critical dashboard banner. Each entry shows the CVSS score/vector, summary, advisory link, and the version that fixes it. Scoped to RouterOS 7; optional `cve-alert` webhook. Informational only — never blocks upgrades or commands
 - **Two-factor authentication (TOTP)** — opt-in per user, RFC 6238 compatible with Google Authenticator / Authy / 1Password / Microsoft Authenticator; AES-256-GCM-encrypted secrets; 8 single-use backup codes; admin reset for lost devices
 - **Encrypted passwords** — AES-256-GCM for stored device credentials
 - **Dark / Light theme** — toggle in sidebar, persisted in localStorage
@@ -185,6 +186,9 @@ docker exec mikr-manager node scripts/seed.js
 | `SYSLOG_TCP_PORT` | No | `5514` | TCP port for the syslog listener (defaults to `SYSLOG_PORT`) |
 | `SYSLOG_RETENTION_DAYS` | No | `7` | Drop log rows older than this many days |
 | `SYSLOG_MAX_ROWS_PER_DEVICE` | No | `10000` | Global per-device row cap (overridable per device in the UI) |
+| `CVE_ENABLED` | No | `true` | Enable RouterOS CVE alerting (daily NVD feed match) |
+| `NVD_API_KEY` | No | _(none)_ | Optional NVD API key — raises the fetch rate limit (not required) |
+| `CVE_CHECK_INTERVAL_MS` | No | `86400000` | How often to refresh the NVD feed (default 24h) |
 
 **Important:** If you rely on auto-generated secrets, **back up `data/.secrets.json`** alongside the SQLite database. Losing it invalidates all sessions and makes stored device passwords unrecoverable. `ENCRYPTION_KEY` must be exactly 64 hex characters — if changed after devices are added, existing encrypted passwords won't decrypt.
 
@@ -220,7 +224,8 @@ All features are available on every tier — the only difference is the device l
 - **Perpetual license** — the software works forever on the purchased version
 - **Update subscription** — grants access to new versions (optional, not required)
 - **Self-hosted** — your data stays on your server, offline license activation
-- No account required, no phone-home, no telemetry
+- No account required, no telemetry, no usage tracking — none of your fleet/device/config data ever leaves the server
+- The only outbound traffic is optional read-only public-feed checks (RouterOS CVE feed from NVD, latest RouterOS version from MikroTik, Manager update from GitHub Releases) — GET-only, carry no data, individually disable-able, and degrade gracefully offline
 
 ## Data & Backup
 
