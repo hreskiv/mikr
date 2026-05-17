@@ -2,7 +2,7 @@
 
 Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your devices from a single dashboard with real-time WebSocket updates.
 
-[![Version](https://img.shields.io/badge/version-1.22.3-blue)](https://github.com/hreskiv/mikr/releases)
+[![Version](https://img.shields.io/badge/version-1.23.0-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
 
 ## Screenshots
@@ -214,12 +214,12 @@ Devices can use SSH or REST as primary method, with SNMP as an optional suppleme
 
 All features are available on every tier — the only difference is the device limit.
 
-| | Community | License 50 | License Unlimited |
-|---|-----------|------------|------------------|
-| **Devices** | up to 10 | up to 50 | Unlimited |
-| **Price** | €0 | €149 (one-time) | €399 (one-time) |
-| **Updates** | — | €49/year (optional) | €99/year (optional) |
-| **All features** | ✓ | ✓ | ✓ |
+| | Community | License 30 | License 50 | License Unlimited |
+|---|-----------|-----------|------------|------------------|
+| **Devices** | up to 10 | up to 30 | up to 50 | Unlimited |
+| **Price** | €0 | €99 (one-time) | €149 (one-time) | €399 (one-time) |
+| **Updates** | — | €39/year (optional) | €49/year (optional) | €99/year (optional) |
+| **All features** | ✓ | ✓ | ✓ | ✓ |
 
 - **Perpetual license** — the software works forever on the purchased version
 - **Update subscription** — grants access to new versions (optional, not required)
