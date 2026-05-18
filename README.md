@@ -2,7 +2,7 @@
 
 Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your devices from a single dashboard with real-time WebSocket updates.
 
-[![Version](https://img.shields.io/badge/version-1.23.3-blue)](https://github.com/hreskiv/mikr/releases)
+[![Version](https://img.shields.io/badge/version-1.24.0-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
 
 ## Screenshots
@@ -45,6 +45,8 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 
 ### Operations
 - **Bulk CLI commands** — execute on multiple devices with live WebSocket output
+- **Run-as credential override** — optionally run a bulk command under your own RouterOS login for that one execution; credentials are never stored or logged
+- **Tag-based target selection** — toggle all devices carrying a tag on/off with one click, alongside Select All/Online and manual picking
 - **RouterOS upgrades** — check for updates + upgrade with real-time progress
 - **Firmware upgrades** — write firmware + automatic reboot
 - **Config backup & export** — save device configurations to database
@@ -84,6 +86,7 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 - **Role-based access** — admin / operator / viewer
 - **JWT authentication** — access token (15min) + refresh token (7d)
 - **RouterOS CVE alerting** — each device's RouterOS version is matched daily against the public NVD vulnerability feed. Dedicated **Security** page with severity/site filters, a per-device Security Advisories card, a `N CVE` badge on device cards, and a High/Critical dashboard banner. Each entry shows the CVSS score/vector, summary, advisory link, and the version that fixes it. Scoped to RouterOS 7; optional `cve-alert` webhook. Informational only — never blocks upgrades or commands
+- **GeoIP block-rule generator** — pick countries and generate an idempotent RouterOS firewall block script (inbound/outbound, IPv4/IPv6, `raw` or `filter` chain, optional weekly auto-refresh) sourced from ipdeny.com; saved as a Script command template and installed via the existing Deploy flow
 - **Two-factor authentication (TOTP)** — opt-in per user, RFC 6238 compatible with Google Authenticator / Authy / 1Password / Microsoft Authenticator; AES-256-GCM-encrypted secrets; 8 single-use backup codes; admin reset for lost devices
 - **Encrypted passwords** — AES-256-GCM for stored device credentials
 - **Dark / Light theme** — toggle in sidebar, persisted in localStorage
