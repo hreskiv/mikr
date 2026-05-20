@@ -2,7 +2,7 @@
 
 Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your devices from a single dashboard with real-time WebSocket updates.
 
-[![Version](https://img.shields.io/badge/version-1.27.0-blue)](https://github.com/hreskiv/mikr/releases)
+[![Version](https://img.shields.io/badge/version-1.28.0-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
 
 ## Screenshots
@@ -88,6 +88,7 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 - **RouterOS CVE alerting** — each device's RouterOS version is matched daily against the public NVD vulnerability feed. Dedicated **Security** page with severity/site filters, a per-device Security Advisories card, a `N CVE` badge on device cards, and a High/Critical dashboard banner. Each entry shows the CVSS score/vector, summary, advisory link, and the version that fixes it. Scoped to RouterOS 7; optional `cve-alert` webhook. Informational only — never blocks upgrades or commands
 - **GeoIP rule generator** — pick countries and generate an idempotent RouterOS firewall script sourced from ipdeny.com: **Blocklist** (drop the selected countries; inbound/outbound, `raw` or `filter`) or **Allowlist** (keep only the selected countries, drop the rest — auto-adds an established/private/always-allow safety block so it can't lock you out); IPv4/IPv6, optional weekly auto-refresh; saved as a Script command template and installed via the existing Deploy flow
 - **Two-factor authentication (TOTP)** — opt-in per user, RFC 6238 compatible with Google Authenticator / Authy / 1Password / Microsoft Authenticator; AES-256-GCM-encrypted secrets; 8 single-use backup codes; admin reset for lost devices
+- **Passkey / WebAuthn / FIDO2 sign-in** — additive second factor alongside TOTP: Touch ID, Face ID, Windows Hello, Apple/Google passkey, YubiKey. Multiple named passkeys per account with last-used info, admin reset, counter-regression check against cloned authenticators. Requires HTTPS on a real domain (WebAuthn spec forbids IP RP IDs) — LAN-IP installs see an explicit "Unavailable" notice rather than silent failure
 - **Encrypted passwords** — AES-256-GCM for stored device credentials
 - **Dark / Light theme** — toggle in sidebar, persisted in localStorage
 
