@@ -2,7 +2,7 @@
 
 Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your devices from a single dashboard with real-time WebSocket updates.
 
-[![Version](https://img.shields.io/badge/version-1.29.1-blue)](https://github.com/hreskiv/mikr/releases)
+[![Version](https://img.shields.io/badge/version-1.30.0-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
 
 ## Screenshots
@@ -92,6 +92,11 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 - **Encrypted passwords** — AES-256-GCM for stored device credentials
 - **Dark / Light theme** — toggle in sidebar, persisted in localStorage
 
+### Configuration
+- **Settings UI for runtime knobs (v1.30.0+)** — admin **Settings → System configuration**: 21 knobs across 11 groups (CVE feed enable/key/interval, activity-log retention, monitor poll cadence and concurrency, traffic and syslog retention, backup and upgrade scheduler intervals, JWT access/refresh expiry, WebAuthn RP ID / name / origins, log level, default SSH / REST API port for new devices). Edit live in the browser, no `docker-compose` edit or container restart, secrets encrypted at rest with AES-256-GCM. Sticky left subnav, one card per group, "from env" badge on any field locked by an environment variable.
+- **Environment variables always win** — anything you set in `.env` / docker-compose stays the source of truth and renders as read-only in the UI with a "from env" badge. GitOps-friendly: existing compose-first deployments don't change behaviour after the upgrade. Bootstrap values (`PORT`, `HOST`, `JWT_SECRET`, `ENCRYPTION_KEY`, `TLS_*`, `SYSLOG_PORT`) stay env-only by design — they're either consumed before settings are loaded, or moving them would invalidate every stored secret on change.
+- **Optional `.rsc` mirror to `/data/exports` (v1.30.0+, closes [#28](https://github.com/hreskiv/mikr/issues/28))** — toggle in Settings → External export. After each successful backup, also writes the RouterOS script export to `/data/exports/<site>/<device>.rsc` — one file per device, overwritten on each new backup. Mount `/data/exports` on a separate host volume for disaster recovery, point a git checkout at it for a free change-history (commit after each write), or rclone it to a NAS / cloud for 3-2-1 backups. Mikr never deletes from this volume; cleanup is yours (git rm / shell).
+
 ## Quick Start
 
 > **Full install guide**, including how to deploy on a **MikroTik Container App** and configure the **RouterOS `dstnat` rule for UDP 5514** (syslog): see [mikr.app/install.html](https://mikr.app/install.html).
@@ -170,6 +175,8 @@ docker exec mikr-manager node scripts/seed.js
 
 ## Environment Variables
 
+All variables below are optional with sensible defaults. **From v1.30.0, most of them are also editable from Admin → Settings → System configuration** without a compose edit or restart — when set as an env var here, they take precedence over the UI value and show as locked with a "from env" badge. Bootstrap values (marked **bootstrap** below) stay env-only.
+
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
 | `JWT_SECRET` | No | auto-generated | Auto-generated on first start, persisted to `data/.secrets.json`. Override by setting env. Generate your own: `openssl rand -hex 48` |
@@ -193,6 +200,15 @@ docker exec mikr-manager node scripts/seed.js
 | `CVE_ENABLED` | No | `true` | Enable RouterOS CVE alerting (daily NVD feed match) |
 | `NVD_API_KEY` | No | _(none)_ | Optional NVD API key — raises the fetch rate limit (not required) |
 | `CVE_CHECK_INTERVAL_MS` | No | `86400000` | How often to refresh the NVD feed (default 24h) |
+| `EXPORT_RSC_ENABLED` | No | `false` | Mirror the latest `.rsc` export to `/data/exports/<site>/<device>.rsc` after each backup (v1.30.0+). Mount `/data/exports` to a host volume for DR / git / rclone. |
+| `ACTIVITY_LOG_RETENTION_DAYS` | No | `90` | Drop audit log rows older than this many days |
+| `JWT_ACCESS_EXPIRY` | No | `15m` | Access token lifetime (jsonwebtoken duration: `15m`, `1h`, `30s`) |
+| `JWT_REFRESH_EXPIRY` | No | `7d` | Refresh token lifetime |
+| `WEBAUTHN_RP_ID` | No | _(none)_ | Registrable domain for passkey sign-in (e.g. `mikr.example.com`). **Must be a real domain, not an IP.** |
+| `WEBAUTHN_RP_NAME` | No | `MikroTik Manager` | Display name shown by the authenticator during passkey registration |
+| `WEBAUTHN_ORIGINS` | No | _(derived from `WEBAUTHN_RP_ID`)_ | Comma-separated list of allowed origins for passkey ceremonies |
+| `DEFAULT_SSH_PORT` | No | `22` | Pre-filled SSH port for new devices (per-device override always wins) |
+| `DEFAULT_API_PORT` | No | `443` | Pre-filled REST API port for new devices |
 
 **Important:** If you rely on auto-generated secrets, **back up `data/.secrets.json`** alongside the SQLite database. Losing it invalidates all sessions and makes stored device passwords unrecoverable. `ENCRYPTION_KEY` must be exactly 64 hex characters — if changed after devices are added, existing encrypted passwords won't decrypt.
 
