@@ -2,7 +2,7 @@
 
 Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your devices from a single dashboard with real-time WebSocket updates.
 
-[![Version](https://img.shields.io/badge/version-1.31.0-blue)](https://github.com/hreskiv/mikr/releases)
+[![Version](https://img.shields.io/badge/version-1.32.0-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
 
 ## Screenshots
@@ -86,6 +86,7 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 - **Role-based access** — admin / operator / viewer
 - **JWT authentication** — access token (15min) + refresh token (7d)
 - **RouterOS CVE alerting** — each device's RouterOS version is matched daily against the public NVD vulnerability feed. Dedicated **Security** page with severity/site filters, a per-device Security Advisories card, a `N CVE` badge on device cards, and a High/Critical dashboard banner. Each entry shows the CVSS score/vector, summary, advisory link, and the version that fixes it. Scoped to RouterOS 7; optional `cve-alert` webhook. Informational only — never blocks upgrades or commands
+- **Auto-block / Simple IDS** — detects repeated failed logins from the syslog stream, aggregates them per source IP across the whole fleet, and past a threshold (default 5 / 10 min) blocks the IP by maintaining a `mikr-blocklist` firewall address-list with a native 72h timeout. Per-device opt-in; **Audit mode** (list candidates, block by hand) or **Auto-block** (block at threshold); whitelist (manual CIDRs + auto private-range + hard-whitelisted server IP). Address-list only — you add one drop rule that references the list; mikr never touches your firewall chains. Candidates / Blocked / Whitelist tabs on the Security page
 - **GeoIP rule generator** — pick countries and generate an idempotent RouterOS firewall script sourced from ipdeny.com: **Blocklist** (drop the selected countries; inbound/outbound, `raw` or `filter`) or **Allowlist** (keep only the selected countries, drop the rest — auto-adds an established/private/always-allow safety block so it can't lock you out); IPv4/IPv6, optional weekly auto-refresh; saved as a Script command template and installed via the existing Deploy flow
 - **Two-factor authentication (TOTP)** — opt-in per user, RFC 6238 compatible with Google Authenticator / Authy / 1Password / Microsoft Authenticator; AES-256-GCM-encrypted secrets; 8 single-use backup codes; admin reset for lost devices
 - **Passkey / WebAuthn / FIDO2 sign-in** — additive second factor alongside TOTP: Touch ID, Face ID, Windows Hello, Apple/Google passkey, YubiKey. Multiple named passkeys per account with last-used info, admin reset, counter-regression check against cloned authenticators. Requires HTTPS on a real domain (WebAuthn spec forbids IP RP IDs) — LAN-IP installs see an explicit "Unavailable" notice rather than silent failure
@@ -200,6 +201,7 @@ All variables below are optional with sensible defaults. **From v1.30.0, most of
 | `CVE_ENABLED` | No | `true` | Enable RouterOS CVE alerting (daily NVD feed match) |
 | `NVD_API_KEY` | No | _(none)_ | Optional NVD API key — raises the fetch rate limit (not required) |
 | `CVE_CHECK_INTERVAL_MS` | No | `86400000` | How often to refresh the NVD feed (default 24h) |
+| `IDS_ENABLED` | No | `false` | Enable Auto-block / Simple IDS (block source IPs of repeated failed logins; per-device opt-in, tune the rest in Settings) |
 | `EXPORT_RSC_ENABLED` | No | `false` | Mirror the latest `.rsc` export to `/data/exports/<site>/<device>.rsc` after each backup (v1.30.0+). Mount `/data/exports` to a host volume for DR / git / rclone. |
 | `ACTIVITY_LOG_RETENTION_DAYS` | No | `90` | Drop audit log rows older than this many days |
 | `JWT_ACCESS_EXPIRY` | No | `15m` | Access token lifetime (jsonwebtoken duration: `15m`, `1h`, `30s`) |
