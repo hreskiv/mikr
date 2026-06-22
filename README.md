@@ -2,7 +2,7 @@
 
 Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your devices from a single dashboard with real-time WebSocket updates.
 
-[![Version](https://img.shields.io/badge/version-1.40.0-blue)](https://github.com/hreskiv/mikr/releases)
+[![Version](https://img.shields.io/badge/version-1.41.0-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
 
 ## Screenshots
@@ -52,6 +52,7 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 - **Config backup & export** — save device configurations to database
 - **Side-by-side diff** — compare any two backups visually
 - **Backup scheduling** — automated exports with time-of-day selection and flexible intervals (2h to 7d)
+- **Site-wide backup schedules (v1.41.0+)** — set one schedule per site; every device in the site inherits it and devices added later are included automatically. Per-device overrides are kept; opt a new device out from the Add Device form
 
 ### Logging & Observability
 - **Built-in syslog receiver (UDP + TCP)** — the Manager ships both UDP and TCP listeners on port `5514` that ingest MikroTik syslog messages, persist them to SQLite, and stream live to the UI over WebSocket. TCP is useful when UDP is blocked by firewalls or when you want guaranteed delivery — RouterOS 7.x supports `Remote Log Protocol: TCP` natively.
