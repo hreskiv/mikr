@@ -2,7 +2,7 @@
 
 Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your devices from a single dashboard with real-time WebSocket updates.
 
-[![Version](https://img.shields.io/badge/version-1.39.0-blue)](https://github.com/hreskiv/mikr/releases)
+[![Version](https://img.shields.io/badge/version-1.40.0-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
 
 ## Screenshots
@@ -87,7 +87,7 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 ### Security & Access
 - **HTTPS / TLS** — optional HTTPS server on port 3443; auto-generated self-signed cert or bring your own; HTTP and HTTPS run in parallel; WebSocket (WSS) works automatically over HTTPS
 - **Role-based access** — superadmin / admin / operator / viewer
-- **Per-site access control (v1.33.0+)** — scope any non-superadmin user to specific sites; the role decides what they can do, the assigned sites decide where. Scoped users only see and act on their sites everywhere (dashboard, devices, logs, backups, live status, bulk commands/upgrades), enforced server-side. Superadmin manages users and grants site access; unrestricted users keep full-fleet access
+- **Per-site access control (v1.33.0+)** — scope any non-superadmin user to specific sites; the role decides what they can do, the assigned sites decide where. Scoped users only see and act on their sites everywhere (dashboard, devices, logs, backups, live status, bulk commands/upgrades), enforced server-side. Superadmin manages users and grants site access; unrestricted users keep full-fleet access. **(v1.40.0+)** Access can be assigned both ways — per user, or per site straight from the Add/Edit Site form (tick which scoped users get the site, instead of editing each user)
 - **JWT authentication** — access token (15min) + refresh token (7d)
 - **RouterOS CVE alerting** — each device's RouterOS version is matched daily against the public NVD vulnerability feed. Dedicated **Security** page with severity/site filters, a per-device Security Advisories card, a `N CVE` badge on device cards, and a High/Critical dashboard banner. Each entry shows the CVSS score/vector, summary, advisory link, and the version that fixes it. Scoped to RouterOS 7; optional `cve-alert` webhook. Informational only — never blocks upgrades or commands
 - **Auto-block / Simple IDS** — detects repeated failed logins from the syslog stream, aggregates them per source IP across the whole fleet, and past a threshold (default 5 / 10 min) blocks the IP by maintaining a `mikr-blocklist` firewall address-list with a native 72h timeout. Per-device opt-in; **Audit mode** (list candidates, block by hand) or **Auto-block** (block at threshold); whitelist (manual CIDRs + auto private-range + hard-whitelisted server IP). Address-list only — you add one drop rule that references the list; mikr never touches your firewall chains. Candidates / Blocked / Whitelist tabs on the Security page
