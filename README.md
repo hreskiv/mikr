@@ -2,7 +2,7 @@
 
 Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your devices from a single dashboard with real-time WebSocket updates.
 
-[![Version](https://img.shields.io/badge/version-1.42.1-blue)](https://github.com/hreskiv/mikr/releases)
+[![Version](https://img.shields.io/badge/version-1.43.0-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
 
 ## Screenshots
@@ -78,7 +78,7 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 - **DHCP leases** — view all leases with IP, MAC, hostname, status badges, and expiry time
 - **Wireless clients** — connected clients with signal strength, TX/RX rates, uptime, and IP from DHCP
 - **Auto-refresh** — DHCP and wireless tables update every 30s while visible, disconnected clients disappear automatically
-- **IPsec tunnels** — configured peers with established/not established state, traffic counters, uptime
+- **IPsec tunnels** — configured peers with established/not established state, traffic counters, uptime; grouped as an expandable **Peer → Policies** tree with per-peer established/total policy counts (v1.43.0+)
 - **WireGuard peers** — endpoint, last handshake (color-coded by recency), TX/RX counters
 - **BGP / OSPF status (v1.38.0+)** — a Routing tab on devices running BGP or OSPF: live BGP sessions with remote AS, state, uptime and **received prefix count**, plus OSPF neighbors with state, adjacency time and area. Surfaces details RouterOS doesn't expose over SNMP (per-peer prefix counts, OSPF neighbors); auto-refreshes, shown only where the protocol is active
 - **BGP history graphs (v1.39.0+)** — each BGP peer keeps a 5-minute history of its received prefix count and session up/down state, charted under the BGP table (auto-scaled Y axis, downtime strip, 6h/24h/7d/30d ranges). Click any BGP row to chart that peer
