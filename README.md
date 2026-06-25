@@ -2,7 +2,7 @@
 
 Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your devices from a single dashboard with real-time WebSocket updates.
 
-[![Version](https://img.shields.io/badge/version-1.44.1-blue)](https://github.com/hreskiv/mikr/releases)
+[![Version](https://img.shields.io/badge/version-1.45.0-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
 
 ## Screenshots
@@ -43,6 +43,7 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 - **Bulk editing** — select multiple devices, change connection parameters in one action
 - **Enable/disable** — disabled devices skip monitoring, dimmed in UI
 - **Import from scan** — discover and add devices from network scan results
+- **Export / import between instances (v1.45.0+)** — export selected devices (by site or individually) to a passphrase-encrypted `.mikrbundle` and import them into another mikr instance, credentials included; ideal for seeding demo/staging from production
 
 ### Operations
 - **Bulk CLI commands** — execute on multiple devices with live WebSocket output
