@@ -2,7 +2,7 @@
 
 Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your devices from a single dashboard with real-time WebSocket updates.
 
-[![Version](https://img.shields.io/badge/version-1.46.0-blue)](https://github.com/hreskiv/mikr/releases)
+[![Version](https://img.shields.io/badge/version-1.47.0-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
 
 ## Screenshots
@@ -84,6 +84,7 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 - **WireGuard peers** — endpoint, last handshake (color-coded by recency), TX/RX counters
 - **LTE monitoring** — per-modem signal (RSRP/RSRQ/SINR/RSSI with bars), operator, band/cell info, session uptime, optional cell-tower location (CellMapper / OpenCelliD), and modem firmware upgrade
 - **LTE SMS inbox (v1.44.0+)** — read SMS received by an LTE modem (time, sender, text) under the device LTE tab, with a sender/text filter and unread tracking; messages are stored in mikr so the history survives the modem auto-erasing its own inbox
+- **LTE data-usage counter (v1.47.0+)** — set a monthly data limit (GB) per LTE device and mikr accumulates the LTE transfer for the calendar month, showing a used/limit bar on the LTE tab and firing a webhook at a warning % (default 80%) and at 100% — once each per cycle. Counts LTE interfaces only; the figure is an estimate accumulated from polling (not the carrier balance). Optional per-device Owner phone is carried in the alert payload for SMS bridging via webhooks
 - **BGP / OSPF status (v1.38.0+)** — a Routing tab on devices running BGP or OSPF: live BGP sessions with remote AS, state, uptime and **received prefix count**, plus OSPF neighbors with state, adjacency time and area. Surfaces details RouterOS doesn't expose over SNMP (per-peer prefix counts, OSPF neighbors); auto-refreshes, shown only where the protocol is active
 - **BGP history graphs (v1.39.0+)** — each BGP peer keeps a 5-minute history of its received prefix count and session up/down state, charted under the BGP table (auto-scaled Y axis, downtime strip, 6h/24h/7d/30d ranges). Click any BGP row to chart that peer
 - **IP services** — see all MikroTik services (SSH, API, WWW, Winbox, FTP) as colored pills, toggle enable/disable with safety checks
