@@ -2,7 +2,7 @@
 
 Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your devices from a single dashboard with real-time WebSocket updates.
 
-[![Version](https://img.shields.io/badge/version-1.45.0-blue)](https://github.com/hreskiv/mikr/releases)
+[![Version](https://img.shields.io/badge/version-1.46.0-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
 
 ## Screenshots
@@ -36,6 +36,7 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 - **SNMP monitoring** — lightweight SNMPv2c polling (CPU, memory, uptime, temperature, voltage)
 - **Three connection methods** — SSH, REST API, or SNMP-only per device
 - **SNMP as supplementary** — SSH/REST devices can also use SNMP for faster status checks
+- **SNMP-first monitoring (v1.46.0+)** — optionally poll routine status **and traffic** over SNMP (IF-MIB 64-bit counters), opening SSH/REST only on demand for actions and detail tabs — keeps long-lived SSH sessions off routers that don't like them. Global toggle or per-device (Default / SNMP / SSH); off by default, never forced
 
 ### Device Management
 - **Site grouping** — organize devices by physical location
