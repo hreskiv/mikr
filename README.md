@@ -2,7 +2,7 @@
 
 Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your devices from a single dashboard with real-time WebSocket updates.
 
-[![Version](https://img.shields.io/badge/version-1.48.1-blue)](https://github.com/hreskiv/mikr/releases)
+[![Version](https://img.shields.io/badge/version-1.48.2-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
 
 ## Screenshots
@@ -242,7 +242,7 @@ All variables below are optional with sensible defaults. **From v1.30.0, most of
 - **REST API** — available on RouterOS 7.1+, supports HTTPS and HTTP
 - **SNMP** — monitoring only (no commands, upgrades, or backups). Useful for devices where SSH/REST isn't available
 
-Devices can use SSH or REST as primary method, with SNMP as an optional supplementary source for faster status checks. The device detail page detects available methods from actual service data and allows quick switching between them.
+Devices can use SSH or REST as primary method, with SNMP as an optional supplementary source for faster status checks. The device detail page detects available methods from actual service data and allows quick switching between them — the SSH / REST / SNMP switch stays available in every state, including SNMP-only and offline devices, so you can always change a device's method back (v1.48.2+).
 
 ## Licensing
 
