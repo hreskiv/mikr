@@ -2,7 +2,7 @@
 
 Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your devices from a single dashboard with real-time WebSocket updates.
 
-[![Version](https://img.shields.io/badge/version-1.49.1-blue)](https://github.com/hreskiv/mikr/releases)
+[![Version](https://img.shields.io/badge/version-1.50.0-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
 
 ## Screenshots
@@ -82,7 +82,7 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 - **Wi-Fi password change** — set new WPA2/WPA3 passphrases from the Wi-Fi tab for modern RouterOS 7 Wi-Fi (`/interface wifi`, incl. CAPsMAN); profile-aware, write-only (current password never shown), admin-only, audited (v1.49.1+)
 - **Auto-refresh** — DHCP and wireless tables update every 30s while visible, disconnected clients disappear automatically
 - **IPsec tunnels** — configured peers with established/not established state, traffic counters, uptime; grouped as an expandable **Peer → Policies** tree with per-peer established/total policy counts (v1.43.0+)
-- **WireGuard peers** — endpoint, last handshake (color-coded by recency), TX/RX counters
+- **WireGuard peers** — endpoint, last handshake (color-coded by recency), TX/RX counters; **Add client** wizard (v1.50.0+) picks the next free tunnel IP (v4 + v6), generates the keypair, writes the peer and returns a QR + downloadable `.conf` — private key shown once, never stored (admin only)
 - **LTE monitoring** — per-modem signal (RSRP/RSRQ/SINR/RSSI with bars), operator, band/cell info, session uptime, optional cell-tower location (CellMapper / OpenCelliD), and modem firmware upgrade
 - **LTE SMS inbox (v1.44.0+)** — read SMS received by an LTE modem (time, sender, text) under the device LTE tab, with a sender/text filter and unread tracking; messages are stored in mikr so the history survives the modem auto-erasing its own inbox
 - **LTE data-usage counter (v1.47.0+)** — set a monthly data limit (GB) per LTE device and mikr accumulates the LTE transfer for the calendar month, showing a used/limit bar on the LTE tab and firing a webhook at a warning % (default 80%) and at 100% — once each per cycle. Counts LTE interfaces only; the figure is an estimate accumulated from polling (not the carrier balance). Optional per-device Owner phone is carried in the alert payload for SMS bridging via webhooks
