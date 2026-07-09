@@ -79,7 +79,7 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 - **PoE indicators** — lightning bolt icon with power, voltage, current in tooltip
 - **DHCP leases** — view all leases with IP, MAC, hostname, status badges, and expiry time
 - **Wireless clients** — connected clients with signal strength, TX/RX rates, uptime, and IP from DHCP
-- **Wi-Fi password change** — reveal and change WPA2/WPA3 passphrases from the Wi-Fi tab for modern RouterOS 7 Wi-Fi (`/interface wifi`, incl. CAPsMAN); profile-aware, admin-only, audited (v1.49.0+)
+- **Wi-Fi password change** — set new WPA2/WPA3 passphrases from the Wi-Fi tab for modern RouterOS 7 Wi-Fi (`/interface wifi`, incl. CAPsMAN); profile-aware, write-only (current password never shown), admin-only, audited (v1.49.0+)
 - **Auto-refresh** — DHCP and wireless tables update every 30s while visible, disconnected clients disappear automatically
 - **IPsec tunnels** — configured peers with established/not established state, traffic counters, uptime; grouped as an expandable **Peer → Policies** tree with per-peer established/total policy counts (v1.43.0+)
 - **WireGuard peers** — endpoint, last handshake (color-coded by recency), TX/RX counters
