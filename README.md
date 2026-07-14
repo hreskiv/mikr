@@ -2,7 +2,7 @@
 
 Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your devices from a single dashboard with real-time WebSocket updates.
 
-[![Version](https://img.shields.io/badge/version-1.50.0-blue)](https://github.com/hreskiv/mikr/releases)
+[![Version](https://img.shields.io/badge/version-1.51.0-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
 
 ## Screenshots
@@ -99,6 +99,7 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 - **Per-site access control (v1.33.0+)** — scope any non-superadmin user to specific sites; the role decides what they can do, the assigned sites decide where. Scoped users only see and act on their sites everywhere (dashboard, devices, logs, backups, live status, bulk commands/upgrades), enforced server-side. Superadmin manages users and grants site access; unrestricted users keep full-fleet access. **(v1.40.0+)** Access can be assigned both ways — per user, or per site straight from the Add/Edit Site form (tick which scoped users get the site, instead of editing each user)
 - **JWT authentication** — access token (15min) + refresh token (7d)
 - **RouterOS CVE alerting** — each device's RouterOS version is matched daily against the public NVD vulnerability feed. Dedicated **Security** page with severity/site filters, a per-device Security Advisories card, a `N CVE` badge on device cards, and a High/Critical dashboard banner. Each entry shows the CVSS score/vector, summary, advisory link, and the version that fixes it. Scoped to RouterOS 7; optional `cve-alert` webhook. Informational only — never blocks upgrades or commands
+- **Vendor patch-gap detection (v1.51.0+)** — a second, independent security signal that catches what CVE databases structurally cannot. mikr reads MikroTik's own release changelogs for the branches you actually run and flags any device below a release that fixed something security-related, using MikroTik's `!)` marker plus any named CVE id. Kept deliberately separate from the CVE feed, because the two make different claims: a CVE says *"this device is vulnerable"* (NVD supplies an affected range), a patch gap says only *"a security release exists on your branch and you're below it"* — a changelog names the **fix** version, never the **affected** range, so mikr never infers one from the other and never guesses across branches. Security lines are snapshotted on first sight and re-checked daily: when the vendor edits or removes one after publication, mikr keeps the original text and shows the edit. **Security → Vendor patches** tab, device-page card, `security-patch-available` webhook
 - **Auto-block / Simple IDS** — detects repeated failed logins from the syslog stream, aggregates them per source IP across the whole fleet, and past a threshold (default 5 / 10 min) blocks the IP by maintaining a `mikr-blocklist` firewall address-list with a native 72h timeout. Per-device opt-in; **Audit mode** (list candidates, block by hand) or **Auto-block** (block at threshold); whitelist (manual CIDRs + auto private-range + hard-whitelisted server IP). Address-list only — you add one drop rule that references the list; mikr never touches your firewall chains. Candidates / Blocked / Whitelist tabs on the Security page
 - **GeoIP rule generator** — pick countries and generate an idempotent RouterOS firewall script sourced from ipdeny.com: **Blocklist** (drop the selected countries; inbound/outbound, `raw` or `filter`) or **Allowlist** (keep only the selected countries, drop the rest — auto-adds an established/private/always-allow safety block so it can't lock you out); IPv4/IPv6, optional weekly auto-refresh; saved as a Script command template and installed via the existing Deploy flow
 - **Two-factor authentication (TOTP)** — opt-in per user, RFC 6238 compatible with Google Authenticator / Authy / 1Password / Microsoft Authenticator; AES-256-GCM-encrypted secrets; 8 single-use backup codes; admin reset for lost devices
@@ -260,7 +261,7 @@ All features are available on every tier — the only difference is the device l
 - **Update subscription** — grants access to new versions (optional, not required)
 - **Self-hosted** — your data stays on your server, offline license activation
 - No account required, no telemetry, no usage tracking — none of your fleet/device/config data ever leaves the server
-- The only outbound traffic is optional read-only public-feed checks (RouterOS CVE feed from NVD, latest RouterOS version from MikroTik, Manager update from GitHub Releases) — GET-only, carry no data, individually disable-able, and degrade gracefully offline
+- The only outbound traffic is optional read-only public-feed checks (RouterOS CVE feed from NVD, RouterOS release changelogs and latest version from MikroTik, Manager update from GitHub Releases) — GET-only, carry no data, individually disable-able, and degrade gracefully offline
 
 ## Data & Backup
 
