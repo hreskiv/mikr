@@ -2,7 +2,7 @@
 
 Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your devices from a single dashboard with real-time WebSocket updates.
 
-[![Version](https://img.shields.io/badge/version-1.53.1-blue)](https://github.com/hreskiv/mikr/releases)
+[![Version](https://img.shields.io/badge/version-1.54.0-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
 
 ## Screenshots
@@ -51,6 +51,7 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 - **Run-as credential override** — optionally run a bulk command under your own RouterOS login for that one execution; credentials are never stored or logged
 - **Tag-based target selection** — toggle all devices carrying a tag on/off with one click, alongside Select All/Online and manual picking
 - **RouterOS upgrades** — check for updates + upgrade with real-time progress
+- **Active Tasks tray** — running upgrades stay visible from any page and survive a reload; each task keeps its own log (v1.54.0+)
 - **Firmware upgrades** — write firmware + automatic reboot
 - **Config backup & export** — save device configurations to database
 - **Side-by-side diff** — compare any two backups visually
