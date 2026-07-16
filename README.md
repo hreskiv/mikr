@@ -2,7 +2,7 @@
 
 Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your devices from a single dashboard with real-time WebSocket updates.
 
-[![Version](https://img.shields.io/badge/version-1.52.0-blue)](https://github.com/hreskiv/mikr/releases)
+[![Version](https://img.shields.io/badge/version-1.53.0-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
 
 ## Screenshots
@@ -32,7 +32,7 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 
 ### Monitoring
 - **Real-time dashboard** — device status cards with WebSocket live updates (60s polling, configurable per device)
-- **Health & SFP optical graphs (v1.42.0+)** — per-device history charts for voltage, temperature, fan speed and any other `/system/health` sensor a model exposes (standalone card, auto-scaled axis, 6h/24h/7d/30d). Fibre ports also get **SFP optical** graphs — Rx/Tx power (dBm), module temperature and supply voltage — via a Traffic/Optical switch on the traffic card. Sampled every 5 minutes, kept 90 days by default; useful even without an SNMP monitoring system. Shown only where sensors / SFP modules are present
+- **Metric & SFP optical graphs (v1.42.0+, CPU/memory v1.53.0+)** — per-device history charts for **CPU load**, **memory usage**, voltage, temperature, fan speed and any other `/system/health` sensor a model exposes (standalone card, auto-scaled axis, 1h/6h/24h/7d/30d). CPU and memory ride along on the regular poll, so they cost no extra device I/O and are graphed on **every** transport, SNMP-polled devices included. Fibre ports also get **SFP optical** graphs — Rx/Tx power (dBm), module temperature and supply voltage — via a Traffic/Optical switch on the traffic card. Sampled every 5 minutes, kept 90 days by default (`METRICS_RETENTION_DAYS`, adjustable in Settings); useful even without an SNMP monitoring system. Works for offline devices, and on models with no sensors at all
 - **SNMP monitoring** — lightweight SNMPv2c polling (CPU, memory, uptime, temperature, voltage)
 - **Three connection methods** — SSH, REST API, or SNMP-only per device
 - **SNMP as supplementary** — SSH/REST devices can also use SNMP for faster status checks
