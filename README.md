@@ -2,7 +2,7 @@
 
 Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your devices from a single dashboard with real-time WebSocket updates.
 
-[![Version](https://img.shields.io/badge/version-1.51.2-blue)](https://github.com/hreskiv/mikr/releases)
+[![Version](https://img.shields.io/badge/version-1.52.0-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
 
 ## Screenshots
@@ -66,6 +66,8 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 - **Per-device retention override** — raise the row cap on chatty core/border routers, lower it on quiet APs, so a log-storm on one device can't evict logs from the rest of the fleet
 - **Setup Guide modal** — one click generates a copy-paste MikroTik CLI snippet and an optional **Command Template** to apply the config to every device at once
 - **On-device syslog + RouterOS `dstnat` (if running mikr inside a MikroTik Container App)** — see the full install guide at [mikr.app/install.html#container](https://mikr.app/install.html#container)
+- **Webhooks** — fire an HTTP notification on device online/offline/not-accessible/rebooted, upgrades, backups, new RouterOS releases, CVE and vendor-patch alerts, and LTE data thresholds. Ready-made **JSON**, **ntfy** and **Discord** formats, optional HMAC-SHA256 signing, and per-event custom message templates
+- **Webhooks to any REST API (v1.52.0+)** — the **Custom** format adds your own headers, body template and HTTP method (POST/GET/PUT), so a webhook can drive an SMS gateway, ticketing system or anything else with a REST endpoint. Write the body your target expects (e.g. `{"to":["+48123456789"],"text":"{{summary}}"}`); placeholders work in the URL too, for APIs that take query parameters. Substituted values are escaped for your `Content-Type`, so quotes in device names or error text can't malform the request. Header values are encrypted at rest like device passwords and are never returned to the browser
 
 ### Network Discovery
 - **IP range scanning** — CIDR, dash ranges, single IP (probes SSH + HTTPS + HTTP)
