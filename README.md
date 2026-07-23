@@ -2,7 +2,7 @@
 
 Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your devices from a single dashboard with real-time WebSocket updates.
 
-[![Version](https://img.shields.io/badge/version-1.58.1-blue)](https://github.com/hreskiv/mikr/releases)
+[![Version](https://img.shields.io/badge/version-1.59.0-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
 
 ## Screenshots
@@ -70,6 +70,7 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 - **On-device syslog + RouterOS `dstnat` (if running mikr inside a MikroTik Container App)** — see the full install guide at [mikr.app/install.html#container](https://mikr.app/install.html#container)
 - **Webhooks** — fire an HTTP notification on device online/offline/not-accessible/rebooted, upgrades, backups, new RouterOS releases, CVE and vendor-patch alerts, LTE data thresholds, and metric thresholds (CPU/memory/temperature). Ready-made **JSON**, **ntfy** and **Discord** formats, optional HMAC-SHA256 signing, and per-event custom message templates
 - **Webhooks to any REST API (v1.52.0+)** — the **Custom** format adds your own headers, body template and HTTP method (POST/GET/PUT), so a webhook can drive an SMS gateway, ticketing system or anything else with a REST endpoint. Write the body your target expects (e.g. `{"to":["+48123456789"],"text":"{{summary}}"}`); placeholders work in the URL too, for APIs that take query parameters. Substituted values are escaped for your `Content-Type`, so quotes in device names or error text can't malform the request. Header values are encrypted at rest like device passwords and are never returned to the browser
+- **Prometheus / Grafana export (v1.59.0+)** — an opt-in `/metrics` endpoint in Prometheus text-exposition format for scraping fleet metrics into a time-series database for long-term graphing. Exposes device up/down, CPU, memory, uptime, temperature, voltage, power, and **per-interface receive/transmit rates** (`mikr_interface_rx_bits_per_second` / `_tx_bits_per_second`) — labelled by device, host, site and interface. Enable and set an optional scrape token under **Settings → Prometheus export** (or `METRICS_ENABLED` / `METRICS_TOKEN`). Reads from the manager's own database, so a scrape adds no load on your routers. InfluxDB users can pull it in via a Telegraf `prometheus` input — see [docs/prometheus-telegraf.md](docs/prometheus-telegraf.md); a starter Grafana dashboard is in [docs/grafana-dashboard.json](docs/grafana-dashboard.json)
 
 ### Network Discovery
 - **IP range scanning** — CIDR, dash ranges, single IP (probes SSH + HTTPS + HTTP)
