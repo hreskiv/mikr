@@ -2,7 +2,7 @@
 
 Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your devices from a single dashboard with real-time WebSocket updates.
 
-[![Version](https://img.shields.io/badge/version-1.59.0-blue)](https://github.com/hreskiv/mikr/releases)
+[![Version](https://img.shields.io/badge/version-1.60.0-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
 
 ## Screenshots
@@ -95,7 +95,7 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 - **BGP history graphs (v1.39.0+)** — each BGP peer keeps a 5-minute history of its received prefix count and session up/down state, charted under the BGP table (auto-scaled Y axis, downtime strip, 6h/24h/7d/30d ranges). Click any BGP row to chart that peer
 - **IP services** — see all MikroTik services (SSH, API, WWW, Winbox, FTP) as colored pills, toggle enable/disable with safety checks
 - **Route counting** — per-protocol breakdown (static, connected, BGP, OSPF, RIP, etc.)
-- **Network topology map** — interactive per-site map built from MNDP/LLDP neighbour discovery: managed devices as draggable cards (status, model, CPU/RAM, IP), physical links styled by speed / bond / wireless, and unknown neighbours as dashed nodes. More reliable link discovery, an empty-state that explains why no links were found, and IPs shown on unmanaged nodes (v1.47.1+)
+- **Network topology map** — interactive per-site map built from MNDP/LLDP neighbour discovery: managed devices as draggable cards (status, model, CPU/RAM, IP), physical links styled by speed / bond / wireless, and unknown neighbours as dashed nodes. More reliable link discovery, an empty-state that explains why no links were found, and IPs shown on unmanaged nodes — resolved from LLDP or, when discovery advertises none, from the ARP tables of your managed devices (ARP fallback v1.60.0+)
 - **Mobile-friendly layout (v1.36.0+)** — manage the fleet from a phone or tablet in the field: slide-in drawer menu, tables that reflow into cards or scroll horizontally, full-width bottom-sheet modals, a readable stacked log viewer, and touch-sized controls. Desktop layout unchanged; Topology stays desktop-only
 
 ### Security & Access
