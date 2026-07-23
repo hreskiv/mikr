@@ -2,7 +2,7 @@
 
 Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your devices from a single dashboard with real-time WebSocket updates.
 
-[![Version](https://img.shields.io/badge/version-1.57.3-blue)](https://github.com/hreskiv/mikr/releases)
+[![Version](https://img.shields.io/badge/version-1.58.0-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
 
 ## Screenshots
@@ -33,6 +33,7 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 ### Monitoring
 - **Real-time dashboard** — device status cards with WebSocket live updates (60s polling, configurable per device)
 - **Metric & SFP optical graphs (v1.42.0+, CPU/memory v1.53.1+)** — per-device history charts for **CPU load**, **memory usage**, voltage, temperature, fan speed and any other `/system/health` sensor a model exposes (standalone card, auto-scaled axis, 1h/6h/24h/7d/30d). CPU and memory ride along on the regular poll, so they cost no extra device I/O and are graphed on **every** transport, SNMP-polled devices included. Fibre ports also get **SFP optical** graphs — Rx/Tx power (dBm), module temperature and supply voltage — via a Traffic/Optical switch on the traffic card. Sampled every 5 minutes, kept 90 days by default (`METRICS_RETENTION_DAYS`, adjustable in Settings); useful even without an SNMP monitoring system. Works for offline devices, and on models with no sensors at all
+- **Metric threshold alerts (v1.58.0+)** — fire a webhook when a device's **CPU load**, **memory usage** or **temperature** crosses a threshold, and an optional recovery webhook when it drops back below. Thresholds set globally in **Settings → Metric alerts** (CPU/memory default 90%, temperature off by default) or overridden per device (`0` disables a metric for that device). An alert only fires after the value stays over the limit for a few consecutive samples (default 3), so brief spikes stay quiet
 - **SNMP monitoring** — lightweight SNMPv2c polling (CPU, memory, uptime, temperature, voltage)
 - **Three connection methods** — SSH, REST API, or SNMP-only per device
 - **SNMP as supplementary** — SSH/REST devices can also use SNMP for faster status checks
@@ -67,7 +68,7 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 - **Per-device retention override** — raise the row cap on chatty core/border routers, lower it on quiet APs, so a log-storm on one device can't evict logs from the rest of the fleet
 - **Setup Guide modal** — one click generates a copy-paste MikroTik CLI snippet and an optional **Command Template** to apply the config to every device at once
 - **On-device syslog + RouterOS `dstnat` (if running mikr inside a MikroTik Container App)** — see the full install guide at [mikr.app/install.html#container](https://mikr.app/install.html#container)
-- **Webhooks** — fire an HTTP notification on device online/offline/not-accessible/rebooted, upgrades, backups, new RouterOS releases, CVE and vendor-patch alerts, and LTE data thresholds. Ready-made **JSON**, **ntfy** and **Discord** formats, optional HMAC-SHA256 signing, and per-event custom message templates
+- **Webhooks** — fire an HTTP notification on device online/offline/not-accessible/rebooted, upgrades, backups, new RouterOS releases, CVE and vendor-patch alerts, LTE data thresholds, and metric thresholds (CPU/memory/temperature). Ready-made **JSON**, **ntfy** and **Discord** formats, optional HMAC-SHA256 signing, and per-event custom message templates
 - **Webhooks to any REST API (v1.52.0+)** — the **Custom** format adds your own headers, body template and HTTP method (POST/GET/PUT), so a webhook can drive an SMS gateway, ticketing system or anything else with a REST endpoint. Write the body your target expects (e.g. `{"to":["+48123456789"],"text":"{{summary}}"}`); placeholders work in the URL too, for APIs that take query parameters. Substituted values are escaped for your `Content-Type`, so quotes in device names or error text can't malform the request. Header values are encrypted at rest like device passwords and are never returned to the browser
 
 ### Network Discovery
