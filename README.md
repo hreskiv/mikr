@@ -2,7 +2,7 @@
 
 Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your devices from a single dashboard with real-time WebSocket updates.
 
-[![Version](https://img.shields.io/badge/version-1.60.0-blue)](https://github.com/hreskiv/mikr/releases)
+[![Version](https://img.shields.io/badge/version-1.61.0-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
 
 ## Screenshots
@@ -96,7 +96,8 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 - **IP services** — see all MikroTik services (SSH, API, WWW, Winbox, FTP) as colored pills, toggle enable/disable with safety checks
 - **Route counting** — per-protocol breakdown (static, connected, BGP, OSPF, RIP, etc.)
 - **Network topology map** — interactive per-site map built from MNDP/LLDP neighbour discovery: managed devices as draggable cards (status, model, CPU/RAM, IP), physical links styled by speed / bond / wireless, and unknown neighbours as dashed nodes. More reliable link discovery, an empty-state that explains why no links were found, and IPs shown on unmanaged nodes — resolved from LLDP or, when discovery advertises none, from the ARP tables of your managed devices (ARP fallback v1.60.0+)
-- **Mobile-friendly layout (v1.36.0+)** — manage the fleet from a phone or tablet in the field: slide-in drawer menu, tables that reflow into cards or scroll horizontally, full-width bottom-sheet modals, a readable stacked log viewer, and touch-sized controls. Desktop layout unchanged; Topology stays desktop-only
+- **Phone layout (v1.61.0+)** — a one-column layout built for incident response from a phone, replacing the responsive pass from v1.36.0: bottom tab bar (Devices / Upgrades / Logs / More) instead of the slide-in drawer, device cards with threshold-coloured CPU / memory / temperature bars grouped by site, pull-to-refresh, role-gated swipe-to-reboot, a device page whose tabs are generated from what the device actually reports (with swipe between them) and the same port faceplate the desktop draws, a bottom action bar with a consequence-stating confirm sheet, and a streaming Command output screen shared with the desktop. Landscape is supported; an expired session is re-authenticated over the screen you were on; the live-connection state and the time the readings froze are always visible. Desktop layout unchanged; Topology stays desktop-only
+- **Installable on a phone (v1.61.0+)** — Add to Home Screen gives mikr its own icon and a full-screen window. Served over HTTPS it also caches the interface itself, so launching it while the manager is unreachable shows the real UI with a clear error rather than a browser page; **nothing from the API is ever cached**, so every reading on screen is live. Over plain HTTP the icon and full-screen window still work — browsers only allow the offline cache on a secure origin
 
 ### Security & Access
 - **HTTPS / TLS** — optional HTTPS server on port 3443; auto-generated self-signed cert or bring your own; HTTP and HTTPS run in parallel; WebSocket (WSS) works automatically over HTTPS
