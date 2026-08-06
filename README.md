@@ -2,7 +2,7 @@
 
 Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your devices from a single dashboard with real-time WebSocket updates.
 
-[![Version](https://img.shields.io/badge/version-1.62.0-blue)](https://github.com/hreskiv/mikr/releases)
+[![Version](https://img.shields.io/badge/version-1.63.0-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
 
 ## Screenshots
@@ -40,7 +40,8 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 - **SNMP-first monitoring (v1.46.0+)** — optionally poll routine status **and traffic** over SNMP (IF-MIB 64-bit counters), opening SSH/REST only on demand for actions and detail tabs — keeps long-lived SSH sessions off routers that don't like them. Global toggle or per-device (Default / SNMP / SSH); off by default, never forced
 
 ### Device Management
-- **Site grouping** — organize devices by physical location
+- **Site grouping** — organize devices by physical location; search sites by name, location or description (v1.63.0+)
+- **Duplicate a device (v1.63.0+)** — clone an existing device from its page: give the copy a name and a host, everything else is inherited (credentials, site, tags, connection method, ports, poll interval). The copy is made server-side, so the stored credentials come with it
 - **Device tags** — assign tags with autocomplete, filter by multiple tags (Shift+click)
 - **Bulk editing** — select multiple devices, change connection parameters in one action
 - **Enable/disable** — disabled devices skip monitoring, dimmed in UI
@@ -58,6 +59,7 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 - **Side-by-side diff** — compare any two backups visually
 - **Backup scheduling** — automated exports with time-of-day selection and flexible intervals (2h to 7d)
 - **Site-wide backup schedules (v1.41.0+)** — set one schedule per site; every device in the site inherits it and devices added later are included automatically. Per-device overrides are kept; opt a new device out from the Add Device form
+- **Global default backup policy (v1.63.0+)** — Settings → Default backup policy sets a fallback for sites that have no schedule of their own, so a newly created site is covered without opening the Backups page. A site schedule overrides it, and a per-device schedule set by hand overrides both. Off by default
 
 ### Logging & Observability
 - **Built-in syslog receiver (UDP + TCP)** — the Manager ships both UDP and TCP listeners on port `5514` that ingest MikroTik syslog messages, persist them to SQLite, and stream live to the UI over WebSocket. TCP is useful when UDP is blocked by firewalls or when you want guaranteed delivery — RouterOS 7.x supports `Remote Log Protocol: TCP` natively.
@@ -115,7 +117,7 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 - **Dark / Light theme** — toggle in sidebar, persisted in localStorage
 
 ### Configuration
-- **Settings UI for runtime knobs (v1.30.0+)** — admin **Settings → System configuration**: 21 knobs across 11 groups (CVE feed enable/key/interval, activity-log retention, monitor poll cadence and concurrency, traffic and syslog retention, backup and upgrade scheduler intervals, JWT access/refresh expiry, WebAuthn RP ID / name / origins, log level, default SSH / REST API port for new devices). Edit live in the browser, no `docker-compose` edit or container restart, secrets encrypted at rest with AES-256-GCM. Sticky left subnav, one card per group, "from env" badge on any field locked by an environment variable.
+- **Settings UI for runtime knobs (v1.30.0+)** — admin **Settings → System configuration**: 47 knobs across 16 groups (CVE feed enable/key/interval, activity-log retention, monitor poll cadence and concurrency, traffic and syslog retention, metric alert thresholds, LTE data usage, auto-block / IDS, Prometheus export, the default backup policy, backup and upgrade scheduler intervals, JWT access/refresh expiry, WebAuthn RP ID / name / origins, log level, default SSH / REST API port for new devices). Edit live in the browser, no `docker-compose` edit or container restart, secrets encrypted at rest with AES-256-GCM. Sticky left subnav, one card per group, "from env" badge on any field locked by an environment variable.
 - **Environment variables always win** — anything you set in `.env` / docker-compose stays the source of truth and renders as read-only in the UI with a "from env" badge. GitOps-friendly: existing compose-first deployments don't change behaviour after the upgrade. Bootstrap values (`PORT`, `HOST`, `JWT_SECRET`, `ENCRYPTION_KEY`, `TLS_*`, `SYSLOG_PORT`) stay env-only by design — they're either consumed before settings are loaded, or moving them would invalidate every stored secret on change.
 - **Optional `.rsc` mirror to `/data/exports` (v1.30.0+, closes [#28](https://github.com/hreskiv/mikr/issues/28))** — toggle in Settings → External export. After each successful backup, also writes the RouterOS script export to `/data/exports/<site>/<device>.rsc` — one file per device, overwritten on each new backup. Mount `/data/exports` on a separate host volume for disaster recovery, point a git checkout at it for a free change-history (commit after each write), or rclone it to a NAS / cloud for 3-2-1 backups. Mikr never deletes from this volume; cleanup is yours (git rm / shell).
 
@@ -224,6 +226,7 @@ All variables below are optional with sensible defaults. **From v1.30.0, most of
 | `CVE_CHECK_INTERVAL_MS` | No | `86400000` | How often to refresh the NVD feed (default 24h) |
 | `IDS_ENABLED` | No | `false` | Enable Auto-block / Simple IDS (block source IPs of repeated failed logins; per-device opt-in, tune the rest in Settings) |
 | `EXPORT_RSC_ENABLED` | No | `false` | Mirror the latest `.rsc` export to `/data/exports/<site>/<device>.rsc` after each backup (v1.30.0+). Mount `/data/exports` to a host volume for DR / git / rclone. |
+| `BACKUP_DEFAULTS_ENABLED` | No | `false` | Global default backup policy for sites with no schedule of their own (v1.63.0+). Interval, start time and retention are `BACKUP_DEFAULTS_INTERVAL_MS` / `_START_TIME` / `_RETENTION_COUNT` / `_RETENTION_DAYS`, or set them all in Settings. |
 | `ACTIVITY_LOG_RETENTION_DAYS` | No | `90` | Drop audit log rows older than this many days |
 | `JWT_ACCESS_EXPIRY` | No | `15m` | Access token lifetime (jsonwebtoken duration: `15m`, `1h`, `30s`) |
 | `JWT_REFRESH_EXPIRY` | No | `7d` | Refresh token lifetime |
