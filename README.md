@@ -2,7 +2,7 @@
 
 Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your devices from a single dashboard with real-time WebSocket updates.
 
-[![Version](https://img.shields.io/badge/version-1.63.1-blue)](https://github.com/hreskiv/mikr/releases)
+[![Version](https://img.shields.io/badge/version-1.64.0-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
 
 ## Screenshots
@@ -42,6 +42,7 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 ### Device Management
 - **Site grouping** — organize devices by physical location; search sites by name, location or description (v1.63.0+)
 - **Duplicate a device (v1.63.0+)** — clone an existing device from its page: give the copy a name and a host, everything else is inherited (credentials, site, tags, connection method, ports, poll interval). The copy is made server-side, so the stored credentials come with it
+- **Read-only RouterOS account warning (v1.64.0+)** — your role here and the rights of the RouterOS user stored for a device are independent. A device whose RouterOS account has no `write` policy carries a `read-only` badge on its card and a note on its page naming the account, so you learn about it when adding the device rather than when an upgrade or a backup is rejected. Test Connection reports it too
 - **Device tags** — assign tags with autocomplete, filter by multiple tags (Shift+click)
 - **Bulk editing** — select multiple devices, change connection parameters in one action
 - **Enable/disable** — disabled devices skip monitoring, dimmed in UI
