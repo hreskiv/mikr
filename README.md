@@ -2,7 +2,7 @@
 
 Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your devices from a single dashboard with real-time WebSocket updates.
 
-[![Version](https://img.shields.io/badge/version-1.64.0-blue)](https://github.com/hreskiv/mikr/releases)
+[![Version](https://img.shields.io/badge/version-1.65.0-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
 
 ## Screenshots
@@ -84,7 +84,7 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 ### Visualization
 - **Full interface discovery** — all types: ethernet, SFP, bridge, VLAN, bonding, wireless, WireGuard, EoIP, GRE, PPPoE
 - **Grouped interface view** — Ethernet/Physical, CAPsMAN/WiFi, Bridge/VLAN/Bond, Tunnels/VPN, categorized with chips
-- **Physical port map (redesigned v1.48.0+, glyphs v1.62.0+)** — a compact faceplate: each port is a slot with a link-speed LED bar, an activity light, a live-traffic sparkline and small marks inside the cage for delivered PoE (⚡) and a discovered neighbour (→). Copper and SFP ports are drawn as separate blocks (fibre ports as distinct SFP cages); wide 24/48-port switches scale the whole two-row faceplate to fit the width (no scroll), and full per-port detail — wattage, optical readings, the neighbour's identity — is a hover away on the desktop and a tap away on a phone, where ports are labelled by number so the whole switch fits the screen
+- **Physical port map (redesigned v1.48.0+, glyphs v1.62.0+, VLANs v1.65.0+)** — a compact faceplate: each port is a slot with a link-speed LED bar, an activity light, a live-traffic sparkline and small marks inside the cage for delivered PoE (⚡) and a discovered neighbour (→). Copper and SFP ports are drawn as separate blocks (fibre ports as distinct SFP cages); wide 24/48-port switches scale the whole two-row faceplate to fit the width (no scroll), and full per-port detail — wattage, optical readings, the neighbour's identity — is a hover away on the desktop and a tap away on a phone, where ports are labelled by number so the whole switch fits the screen. Each port also shows its **VLAN role** — access or trunk, with the tagged VLANs and the native VLAN — read from whichever place the model keeps it (bridge VLAN table or switch chip) and presented identically for both. A VLAN picker above the faceplate highlights every port carrying the chosen VLAN, filled where it leaves untagged and outlined where it leaves tagged. On models where enabling bridge VLAN filtering costs the hardware offload, the map says so
 - **PoE indicators** — lightning bolt icon with power, voltage, current in tooltip
 - **DHCP leases** — view all leases with IP, MAC, hostname, status badges, and expiry time
 - **Wireless clients** — connected clients with signal strength, TX/RX rates, uptime, and IP from DHCP
