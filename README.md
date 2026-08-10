@@ -2,7 +2,7 @@
 
 Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your devices from a single dashboard with real-time WebSocket updates.
 
-[![Version](https://img.shields.io/badge/version-1.67.0-blue)](https://github.com/hreskiv/mikr/releases)
+[![Version](https://img.shields.io/badge/version-1.67.1-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
 
 ## Screenshots
@@ -34,7 +34,7 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 - **Real-time dashboard** — device status cards with WebSocket live updates (60s polling, configurable per device)
 - **Metric & SFP optical graphs (v1.42.0+, CPU/memory v1.53.1+)** — per-device history charts for **CPU load**, **memory usage**, voltage, temperature, fan speed and any other `/system/health` sensor a model exposes (standalone card, auto-scaled axis, 1h/6h/24h/7d/30d). CPU and memory ride along on the regular poll, so they cost no extra device I/O and are graphed on **every** transport, SNMP-polled devices included. Fibre ports also get **SFP optical** graphs — Rx/Tx power (dBm), module temperature and supply voltage — via a Traffic/Optical switch on the traffic card. Sampled every 5 minutes, kept 90 days by default (`METRICS_RETENTION_DAYS`, adjustable in Settings); useful even without an SNMP monitoring system. Works for offline devices, and on models with no sensors at all
 - **Metric threshold alerts (v1.58.0+)** — fire a webhook when a device's **CPU load**, **memory usage** or **temperature** crosses a threshold, and an optional recovery webhook when it drops back below. Thresholds set globally in **Settings → Metric alerts** (CPU/memory default 90%, temperature off by default) or overridden per device (`0` disables a metric for that device). An alert only fires after the value stays over the limit for a few consecutive samples (default 3), so brief spikes stay quiet
-- **SNMP monitoring** — lightweight SNMPv2c polling (CPU, memory, uptime, temperature, voltage)
+- **SNMP monitoring** — lightweight SNMPv2c polling (CPU, memory, uptime, temperature, voltage). Sensors are read from the named health table as well as the scalar OIDs (v1.67.1+), so boards that publish only the former — most of the ax generation — report the same temperature over SNMP as over SSH
 - **Three connection methods** — SSH, REST API, or SNMP-only per device
 - **SNMP as supplementary** — SSH/REST devices can also use SNMP for faster status checks
 - **SNMP-first monitoring (v1.46.0+)** — optionally poll routine status **and traffic** over SNMP (IF-MIB 64-bit counters), opening SSH/REST only on demand for actions and detail tabs — keeps long-lived SSH sessions off routers that don't like them. Global toggle or per-device (Default / SNMP / SSH); off by default, never forced
