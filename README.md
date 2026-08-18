@@ -2,7 +2,7 @@
 
 Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your devices from a single dashboard with real-time WebSocket updates.
 
-[![Version](https://img.shields.io/badge/version-1.71.0-blue)](https://github.com/hreskiv/mikr/releases)
+[![Version](https://img.shields.io/badge/version-1.72.0-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
 
 ## Screenshots
@@ -53,7 +53,7 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 - **Bulk CLI commands** — execute on multiple devices with live WebSocket output
 - **Run-as credential override** — optionally run a bulk command under your own RouterOS login for that one execution; credentials are never stored or logged
 - **Tag-based target selection** — toggle all devices carrying a tag on/off with one click, alongside Select All/Online and manual picking
-- **RouterOS upgrades** — check for updates + upgrade with real-time progress
+- **RouterOS upgrades** — check for updates + upgrade with real-time progress. **(v1.72.0+)** Read the release notes for a version before installing it — the version badges on the Upgrades page and "What's new" on a device page open that version's RouterOS changelog, grouped by package, with anything MikroTik flagged and any CVE numbers first. Full Upgrade (RouterOS + firmware) is offered on any pending RouterOS update, so both take one trip rather than two
 - **Active Tasks tray** — running upgrades stay visible from any page and survive a reload; each task keeps its own log (v1.54.0+)
 - **Firmware upgrades** — write firmware + automatic reboot
 - **Config backup & export** — save device configurations to database. **(v1.55.0+)** Every export is verified complete before it is stored, and backups taken earlier are checked on upgrade — any that do not hold a whole config are marked **incomplete** so they are never mistaken for a usable restore point
