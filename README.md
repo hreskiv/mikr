@@ -2,7 +2,7 @@
 
 Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your devices from a single dashboard with real-time WebSocket updates.
 
-[![Version](https://img.shields.io/badge/version-1.75.1-blue)](https://github.com/hreskiv/mikr/releases)
+[![Version](https://img.shields.io/badge/version-1.76.0-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
 
 ## Screenshots
@@ -58,6 +58,7 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 - **Firmware upgrades** — write firmware + automatic reboot
 - **Config backup & export** — save device configurations to database. **(v1.55.0+)** Every export is verified complete before it is stored, and backups taken earlier are checked on upgrade — any that do not hold a whole config are marked **incomplete** so they are never mistaken for a usable restore point
 - **Side-by-side diff** — compare any two backups visually
+- **Bulk backup download (v1.76.0+)** — download the newest backup of every device you can see as one `.zip`, laid out `<site>/<device>_<date>.rsc`, instead of one config at a time. Pick the whole fleet or a single site; it follows site scope, so a scoped admin gets exactly their sites
 - **Fleet backup health (v1.69.0+)** — the Backups page opens with how many devices are covered and what is wrong with the rest, split into no backup, incomplete latest export, overdue schedule (two consecutive missed runs, so a single offline run raises nothing) and no schedule at all. Click a count for the devices behind it and back one up or give it a schedule from there. Disabled and SNMP-only devices are left out, and nothing is asked of a device to produce it
 - **Backup scheduling** — automated exports with time-of-day selection and flexible intervals (2h to 7d)
 - **Site-wide backup schedules (v1.41.0+)** — set one schedule per site; every device in the site inherits it and devices added later are included automatically. Per-device overrides are kept; opt a new device out from the Add Device form
