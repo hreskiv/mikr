@@ -2,7 +2,7 @@
 
 Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your devices from a single dashboard with real-time WebSocket updates.
 
-[![Version](https://img.shields.io/badge/version-1.85.0-blue)](https://github.com/hreskiv/mikr/releases)
+[![Version](https://img.shields.io/badge/version-1.85.1-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
 
 ## Screenshots
@@ -248,6 +248,8 @@ All variables below are optional with sensible defaults. **From v1.30.0, most of
 
 ## Connection Methods
 
+> **RouterOS 7 is required on the managed devices.** RouterOS 6 is legacy: it is out of scope, is not tested and is not supported, SNMP included. A 6.x device can still pass Test Connection, because the test only proves that the login works, and then leave its device page empty.
+
 | Capability | SSH | REST API | SNMP |
 |------------|-----|----------|------|
 | Status monitoring | ✓ | ✓ | ✓ |
@@ -258,7 +260,7 @@ All variables below are optional with sensible defaults. **From v1.30.0, most of
 | Self-signed TLS | N/A | ✓ | N/A |
 | Session overhead | 1 SSH conn | HTTPS per request | UDP per poll |
 
-- **SSH** — non-interactive exec, best compatibility with all RouterOS versions
+- **SSH** — non-interactive exec, works on every RouterOS 7 release and needs no service beyond SSH itself
 - **REST API** — available on RouterOS 7.1+, supports HTTPS and HTTP
 - **SNMP** — monitoring only (no commands, upgrades, or backups). Useful for devices where SSH/REST isn't available
 
