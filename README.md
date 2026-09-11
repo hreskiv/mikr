@@ -2,7 +2,7 @@
 
 Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your devices from a single dashboard with real-time WebSocket updates.
 
-[![Version](https://img.shields.io/badge/version-1.85.2-blue)](https://github.com/hreskiv/mikr/releases)
+[![Version](https://img.shields.io/badge/version-1.86.0-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
 
 ## Screenshots
@@ -44,6 +44,7 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 - **Duplicate a device (v1.63.0+)** — clone an existing device from its page: give the copy a name and a host, everything else is inherited (credentials, site, tags, connection method, ports, poll interval). The copy is made server-side, so the stored credentials come with it
 - **Read-only RouterOS account warning (v1.64.0+)** — your role here and the rights of the RouterOS user stored for a device are independent. A device whose RouterOS account has no `write` policy carries a `read-only` badge on its card and a note on its page naming the account, so you learn about it when adding the device rather than when an upgrade or a backup is rejected. Test Connection reports it too
 - **Device tags** — assign tags with autocomplete, filter by multiple tags (Shift+click)
+- **Site filter (v1.86.0+)** — a picker beside the search box on the Devices page narrows it to one site, alongside the search, status and tag filters; devices belonging to no site are selectable as their own entry
 - **Bulk editing** — select multiple devices, change connection parameters in one action
 - **Enable/disable** — disabled devices skip monitoring, dimmed in UI
 - **Import from scan** — discover and add devices from network scan results
@@ -54,7 +55,7 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 - **Run-as credential override** — optionally run a bulk command under your own RouterOS login for that one execution; credentials are never stored or logged
 - **Tag-based target selection** — toggle all devices carrying a tag on/off with one click, alongside Select All/Online and manual picking
 - **RouterOS upgrades** — check for updates + upgrade with real-time progress. **(v1.72.0+)** Read the release notes for a version before installing it — the version badges on the Upgrades page and "What's new" on a device page open that version's RouterOS changelog, grouped by package, with anything MikroTik flagged and any CVE numbers first. Full Upgrade (RouterOS + firmware) is offered on any pending RouterOS update, so both take one trip rather than two
-- **Sequential upgrade queue** — one device at a time, in an order you control, with PoE-aware ordering so a switch is upgraded after the devices it powers. **(v1.81.0+)** *Add all needing update* fills the queue in one press with every online device that is behind, by the upgrade type selected, instead of picking a hundred devices by hand; devices that have never run an update check are left out and counted, not silently skipped. **(v1.82.0+)** *Schedule…* puts the devices you have selected in the table on a schedule for a later time, so a maintenance window is set from the same filtered list you were already looking at, rather than by finding each device again in the Schedule tab's picker
+- **Sequential upgrade queue** — one device at a time, in an order you control, with PoE-aware ordering so a switch is upgraded after the devices it powers. **(v1.81.0+)** *Add all needing update* fills the queue in one press with every online device that is behind, by the upgrade type selected, instead of picking a hundred devices by hand; devices that have never run an update check are left out and counted, not silently skipped. **(v1.82.0+)** *Schedule…* puts the devices you have selected in the table on a schedule for a later time, so a maintenance window is set from the same filtered list you were already looking at, rather than by finding each device again in the Schedule tab's picker. **(v1.86.0+)** A saved queue preset can be given its own run time under *Manage…*: at that time the queue runs exactly as you saved it, in your order, once — devices deleted or disabled in the meantime are skipped and the rest keep their places
 - **Active Tasks tray** — running upgrades stay visible from any page and survive a reload; each task keeps its own log (v1.54.0+)
 - **Firmware upgrades** — write firmware + automatic reboot
 - **Config backup & export** — save device configurations to database. **(v1.55.0+)** Every export is verified complete before it is stored, and backups taken earlier are checked on upgrade — any that do not hold a whole config are marked **incomplete** so they are never mistaken for a usable restore point
