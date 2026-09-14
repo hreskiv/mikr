@@ -2,7 +2,7 @@
 
 Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your devices from a single dashboard with real-time WebSocket updates.
 
-[![Version](https://img.shields.io/badge/version-1.89.0-blue)](https://github.com/hreskiv/mikr/releases)
+[![Version](https://img.shields.io/badge/version-1.89.1-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
 
 ## Screenshots
@@ -31,7 +31,7 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 ## Features
 
 ### Monitoring
-- **Real-time dashboard** — device status cards with WebSocket live updates (60s polling, configurable per device)
+- **Real-time dashboard** — device status cards with WebSocket live updates (60s polling, configurable per device). **(v1.89.1+)** Each browser tab is titled with the page it shows — or the device's name on a device page — so several open tabs can be told apart
 - **Metric & SFP optical graphs (v1.42.0+, CPU/memory v1.53.1+)** — per-device history charts for **CPU load**, **memory usage**, voltage, temperature, fan speed and any other `/system/health` sensor a model exposes (standalone card, auto-scaled axis, 1h/6h/24h/7d/30d). CPU and memory ride along on the regular poll, so they cost no extra device I/O and are graphed on **every** transport, SNMP-polled devices included. Fibre ports also get **SFP optical** graphs — Rx/Tx power (dBm), module temperature and supply voltage — via a Traffic/Optical switch on the traffic card. Sampled every 5 minutes, kept 90 days by default (`METRICS_RETENTION_DAYS`, adjustable in Settings); useful even without an SNMP monitoring system. Works for offline devices, and on models with no sensors at all. **(v1.80.0+)** Charts plot against real time and break the line where sampling stopped, so a gap is drawn as a gap rather than as a normal step; mikr also reports devices whose history has holes while they were up
 - **Metric threshold alerts (v1.58.0+)** — fire a webhook when a device's **CPU load**, **memory usage** or **temperature** crosses a threshold, and an optional recovery webhook when it drops back below. Thresholds set globally in **Settings → Metric alerts** (CPU/memory default 90%, temperature off by default) or overridden per device (`0` disables a metric for that device). An alert only fires after the value stays over the limit for a few consecutive samples (default 3), so brief spikes stay quiet
 - **SNMP monitoring** — lightweight SNMPv2c polling (CPU, memory, uptime, temperature, voltage). Sensors are read from the named health table as well as the scalar OIDs (v1.67.1+), so boards that publish only the former — most of the ax generation — report the same temperature over SNMP as over SSH. **(v1.88.0+)** A device added by a name that has only an IPv6 address is polled over IPv6; a name that also has an IPv4 address keeps using IPv4
