@@ -2,7 +2,7 @@
 
 Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your devices from a single dashboard with real-time WebSocket updates.
 
-[![Version](https://img.shields.io/badge/version-1.90.0-blue)](https://github.com/hreskiv/mikr/releases)
+[![Version](https://img.shields.io/badge/version-1.90.1-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
 
 ## Screenshots
@@ -45,6 +45,7 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 - **Read-only RouterOS account warning (v1.64.0+)** — your role here and the rights of the RouterOS user stored for a device are independent. A device whose RouterOS account has no `write` policy carries a `read-only` badge on its card and a note on its page naming the account, so you learn about it when adding the device rather than when an upgrade or a backup is rejected. Test Connection reports it too
 - **Serial number and software ID (v1.90.0+)** — the device page shows the board's serial number and its software ID, or system ID on a CHR, once the device has reported them. The API returns both, so another tool can match a device on its hardware after its name or address has changed
 - **Device tags** — assign tags with autocomplete, filter by multiple tags (Shift+click)
+- **Device notes (v1.90.1+)** — free text per device, shown on the device page and matched by the search on the Devices page
 - **Site filter (v1.86.0+)** — a picker beside the search box on the Devices page narrows it to one site, alongside the search, status and tag filters; devices belonging to no site are selectable as their own entry
 - **Bulk editing** — select multiple devices, change connection parameters in one action
 - **Enable/disable** — disabled devices skip monitoring, dimmed in UI
