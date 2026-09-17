@@ -2,7 +2,7 @@
 
 Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your devices from a single dashboard with real-time WebSocket updates.
 
-[![Version](https://img.shields.io/badge/version-1.92.1-blue)](https://github.com/hreskiv/mikr/releases)
+[![Version](https://img.shields.io/badge/version-1.93.0-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
 
 ## Screenshots
@@ -71,7 +71,7 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 ### Logging & Observability
 - **Built-in syslog receiver (UDP + TCP)** — the Manager ships both UDP and TCP listeners on port `5514` that ingest MikroTik syslog messages, persist them to SQLite, and stream live to the UI over WebSocket. TCP is useful when UDP is blocked by firewalls or when you want guaranteed delivery — RouterOS 7.x supports `Remote Log Protocol: TCP` natively.
 - **Native RouterOS format** — topics and messages appear exactly as in `/log print` (works out of the box with `remote-log-format=default`; also accepts `<PRI>`-prefixed and `bsd-syslog=yes` RFC3164 forms)
-- **Unified Logs page** — all devices in one stream with colored severity stripe, filters (device, severity, topic, text search), time range selector (`All time` / `Last 1h` / `6h` / `24h` / `7d`), **Load older** pagination, pause and auto-scroll
+- **Unified Logs page** — all devices in one stream with colored severity stripe, filters (device, severity, topic, text search), time range selector (`All time` / `Last 1h` / `6h` / `24h` / `7d`), **Load older** pagination, pause and auto-scroll; **Export (v1.93.0+)** of whatever the filter shows, as CSV or plain text, up to the newest 100,000 entries
 - **Per-device Logs tab** — focused view on the device detail page for troubleshooting a specific router
 - **Multi-IP device correlation** — logs are matched to the right device by **any** interface IP (collected each monitor poll), so the syslog source IP doesn't need to equal the management IP and `src-address=` pinning is optional. A device added by a DDNS name (IP/Cloud or third-party) has that name resolved and its address matched too (v1.85.0+); an address two devices resolve to is left unattributed rather than guessed
 - **Per-device retention override** — raise the row cap on chatty core/border routers, lower it on quiet APs, so a log-storm on one device can't evict logs from the rest of the fleet
