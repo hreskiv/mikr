@@ -2,7 +2,7 @@
 
 Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your devices from a single dashboard with real-time WebSocket updates.
 
-[![Version](https://img.shields.io/badge/version-1.95.1-blue)](https://github.com/hreskiv/mikr/releases)
+[![Version](https://img.shields.io/badge/version-1.96.0-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
 
 ## Screenshots
@@ -47,13 +47,13 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 - **Site grouping** — organize devices by physical location; search sites by name, location or description (v1.63.0+)
 - **Duplicate a device (v1.63.0+)** — clone an existing device from its page: give the copy a name and a host, everything else is inherited (credentials, site, tags, connection method, ports, poll interval). The copy is made server-side, so the stored credentials come with it
 - **Read-only RouterOS account warning (v1.64.0+)** — your role here and the rights of the RouterOS user stored for a device are independent. A device whose RouterOS account has no `write` policy carries a `read-only` badge on its card and a note on its page naming the account, so you learn about it when adding the device rather than when an upgrade or a backup is rejected. Test Connection reports it too
-- **Serial number and software ID (v1.90.0+)** — the device page shows the board's serial number and its software ID, or system ID on a CHR, once the device has reported them. The API returns both, so another tool can match a device on its hardware after its name or address has changed
+- **Serial number and software ID (v1.90.0+)** — the device page shows the board's serial number and its software ID, or system ID on a CHR, once the device has reported them. The API returns both, so another tool can match a device on its hardware after its name or address has changed. If a different board answers at a device's address, the device shows **Other device** and nothing is written or sent to it until you fix the address or accept the new serial (v1.96.0+)
 - **Device tags** — assign tags with autocomplete, filter by multiple tags (Shift+click)
 - **Device notes (v1.90.1+)** — free text per device, shown on the device page and matched by the search on the Devices page
 - **Site filter (v1.86.0+)** — a picker beside the search box on the Devices page narrows it to one site, alongside the search, status and tag filters; devices belonging to no site are selectable as their own entry
 - **Bulk editing** — select multiple devices, change connection parameters in one action
 - **Enable/disable** — disabled devices skip monitoring, dimmed in UI
-- **Import from scan** — discover and add devices from network scan results
+- **Import from scan** — discover and add devices from network scan results. Devices already added are recognised by address, DNS name or serial number, and Add skips duplicates (v1.96.0+)
 - **Export / import between instances (v1.45.0+)** — export selected devices (by site or individually) to a passphrase-encrypted `.mikrbundle` and import them into another mikr instance, credentials included; ideal for seeding demo/staging from production
 
 ### Operations
@@ -88,7 +88,7 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 - **MCP endpoint for AI assistants (v1.73.0+)** — an opt-in read-only [Model Context Protocol](https://modelcontextprotocol.io) server at `/mcp`, so an assistant can be pointed at the manager and asked what is wrong right now, what versions the fleet runs, which devices are behind on backups, or what one device looks like. Ten tools shaped around those questions rather than around routes, each answering in prose or a small table. Authenticated with the API keys you already issue, and bounded by that key's role and site scope — an assistant sees exactly what its key's owner would. It reads and never writes: nothing in it can upgrade, reboot or change a device. Off by default (Settings → MCP endpoint); while off the path returns 404 to everyone. **Browser-based clients (v1.74.0+)** — claude.ai and anything built the same way have no config file to read a key from, so they sign in over OAuth: a consent screen asks for one of your API keys, and the connection carries that key's role and site scope. It needs an install reachable from the internet over HTTPS (Settings → MCP endpoint → Public URL); on a LAN-only install those endpoints stay 404 and a command-line assistant with an API key works as before
 
 ### Network Discovery
-- **IP range scanning** — CIDR, dash ranges, single IP (probes SSH + HTTPS + HTTP)
+- **IP range scanning** — CIDR, dash ranges, single IP (probes SSH + HTTPS + HTTP; leave a port empty to skip that check, v1.96.0+)
 - **Neighbor discovery** — MNDP / LLDP / CDP with clickable links to managed devices
 - **MAC→IPv4 cross-reference** — resolves link-local IPv6 neighbors to real addresses
 
@@ -100,7 +100,7 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 - **PoE indicators** — lightning bolt icon with power, voltage, current in tooltip
 - **PoE budget (v1.71.0+)** — on switches with PoE-out, on desktop and phone, a card showing watts delivered against the watts the model can deliver, and how many ports are actually feeding something. The ceiling comes from a per-model table (RouterOS reports consumption but never a budget): a fixed figure for switches with an internal PSU, the fitted-PSU count for a CRS320, and current limit x measured supply voltage for switches you power yourself. CRS328-24P also shows its three per-group ceilings. Models outside the table show the draw without a bar. **(v1.73.0+)** A device can be told which power supply it runs on — MikroTik's by name, or any other by volts and amps — and the ceiling follows from that: routers with PoE-out are budgeted for the first time (RB5009UPr+S+IN: 76 W on the bundled adapter, 130 W on a bigger one), and a supply too small for the board caps the budget instead of the board's own limit. **(v1.75.0+)** The card also reads the voltage the board reports: below the high-voltage class it says so, because passive PoE-out carries whatever voltage the board is fed and only devices that accept it will start, and if the reported voltage contradicts the supply you selected — a brick swapped without changing the field — the card tells you the two disagree. **(v1.87.0+)** hEX PoE is covered too: it delivers at whatever voltage it is fed, so naming the supply is the only way it can have a ceiling, and until you do the card shows the draw and says so rather than guessing
 - **DHCP leases** — view all leases with IP, MAC, hostname, status badges, and expiry time
-- **Wireless clients** — connected clients with signal strength, TX/RX rates, uptime, and IP from DHCP
+- **Wireless clients** — connected clients with signal strength, band, TX/RX rates, uptime, and IP from DHCP (rates and band on the `wifi` package v1.96.0+)
 - **Wi-Fi password change** — set new WPA2/WPA3 passphrases from the Wi-Fi tab for modern RouterOS 7 Wi-Fi (`/interface wifi`, incl. CAPsMAN); profile-aware, write-only (current password never shown), admin-only, audited (v1.49.1+)
 - **Auto-refresh** — DHCP and wireless tables update every 30s while visible, disconnected clients disappear automatically
 - **IPsec tunnels** — configured peers with established/not established state, traffic counters, uptime; grouped as an expandable **Peer → Policies** tree with per-peer established/total policy counts (v1.43.0+)
