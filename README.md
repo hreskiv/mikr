@@ -2,7 +2,7 @@
 
 Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your devices from a single dashboard with real-time WebSocket updates.
 
-[![Version](https://img.shields.io/badge/version-1.96.0-blue)](https://github.com/hreskiv/mikr/releases)
+[![Version](https://img.shields.io/badge/version-1.97.0-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
 
 ## Screenshots
@@ -42,6 +42,7 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 - **Three connection methods** — SSH, REST API, or SNMP-only per device
 - **SNMP as supplementary** — SSH/REST devices can also use SNMP for faster status checks
 - **SNMP-first monitoring (v1.46.0+)** — optionally poll routine status **and traffic** over SNMP (IF-MIB 64-bit counters), opening SSH/REST only on demand for actions and detail tabs — keeps long-lived SSH sessions off routers that don't like them. Global toggle or per-device (Default / SNMP / SSH); off by default, never forced
+- **Interface traffic history** — one-minute samples per interface, 7 days by default; per device you can limit it to chosen interfaces, which matters on routers with hundreds of VLANs, and the storage takes about a sixth of what it used to (v1.97.0+)
 
 ### Device Management
 - **Site grouping** — organize devices by physical location; search sites by name, location or description (v1.63.0+)
@@ -53,7 +54,7 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 - **Site filter (v1.86.0+)** — a picker beside the search box on the Devices page narrows it to one site, alongside the search, status and tag filters; devices belonging to no site are selectable as their own entry
 - **Bulk editing** — select multiple devices, change connection parameters in one action
 - **Enable/disable** — disabled devices skip monitoring, dimmed in UI
-- **Import from scan** — discover and add devices from network scan results. Devices already added are recognised by address, DNS name or serial number, and Add skips duplicates (v1.96.0+)
+- **Import from scan** — discover and add devices from network scan results. Devices already added are recognised by address, DNS name or serial number, and Add skips duplicates (v1.96.0+). A known device found by serial at a new address gets an **Update address** button that moves its entry there (v1.97.0+)
 - **Export / import between instances (v1.45.0+)** — export selected devices (by site or individually) to a passphrase-encrypted `.mikrbundle` and import them into another mikr instance, credentials included; ideal for seeding demo/staging from production
 
 ### Operations
@@ -172,6 +173,8 @@ services:
       # Override here if you want to set your own:
       # - JWT_SECRET=$(openssl rand -hex 48)
       # - ENCRYPTION_KEY=$(openssl rand -hex 32)
+      # Optional: the first admin's password instead of the default "admin"
+      # - INITIAL_ADMIN_PASSWORD=choose-one
 EOF
 
 # Start
@@ -181,9 +184,9 @@ docker compose up -d
 docker exec mikr-manager node scripts/seed.js
 ```
 
-Open `http://<host>:3000`, login: **admin** / **admin**
+Open `http://<host>:3000`, login: **admin** / **admin**. The first sign-in with the default password asks for a new one before anything else opens. Set `INITIAL_ADMIN_PASSWORD` before the first start to skip the default altogether (v1.97.0+).
 
-> **Production:** Change the default password immediately. Create a dedicated MikroTik user group with only the required policies instead of using `admin` with full access:
+> **Production:** Create a dedicated MikroTik user group with only the required policies instead of using `admin` with full access:
 > ```
 > /user/group/add name=manager-group policy=ssh,reboot,read,write,sensitive,rest-api,policy,!local,!telnet,!ftp,!test,!winbox,!password,!web,!sniff,api,!romon
 > /user/add name=mikr group=manager-group password=YOUR_PASSWORD
