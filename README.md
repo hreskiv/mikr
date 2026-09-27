@@ -2,7 +2,7 @@
 
 Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your devices from a single dashboard with real-time WebSocket updates.
 
-[![Version](https://img.shields.io/badge/version-1.97.1-blue)](https://github.com/hreskiv/mikr/releases)
+[![Version](https://img.shields.io/badge/version-1.97.2-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
 
 ## Screenshots
@@ -42,7 +42,7 @@ Self-hosted web application for managing MikroTik device fleets. Monitor, config
 - **Three connection methods** — SSH, REST API, or SNMP-only per device
 - **SNMP as supplementary** — SSH/REST devices can also use SNMP for faster status checks
 - **SNMP-first monitoring (v1.46.0+)** — optionally poll routine status **and traffic** over SNMP (IF-MIB 64-bit counters), opening SSH/REST only on demand for actions and detail tabs — keeps long-lived SSH sessions off routers that don't like them. Global toggle or per-device (Default / SNMP / SSH); off by default, never forced
-- **Interface traffic history** — one-minute samples per interface, 7 days by default; per device you can limit it to chosen interfaces, which matters on routers with hundreds of VLANs, and the storage takes about a sixth of what it used to (v1.97.0+)
+- **Interface traffic history** — one-minute samples per interface, 7 days by default; per device you can limit it to chosen interfaces, which matters on routers with hundreds of VLANs, and the storage takes about a sixth of what it used to (v1.97.0+). Upgrading a large install keeps the old history and converts it in the background, with a dashboard banner to delete the old copy afterwards (v1.97.2+)
 
 ### Device Management
 - **Site grouping** — organize devices by physical location; search sites by name, location or description (v1.63.0+)
@@ -177,11 +177,8 @@ services:
       # - INITIAL_ADMIN_PASSWORD=choose-one
 EOF
 
-# Start
+# Start (the first start creates the admin user)
 docker compose up -d
-
-# Create default admin user (first run only)
-docker exec mikr-manager node scripts/seed.js
 ```
 
 Open `http://<host>:3000`, login: **admin** / **admin**. The first sign-in with the default password asks for a new one before anything else opens. Set `INITIAL_ADMIN_PASSWORD` before the first start to skip the default altogether (v1.97.0+).
@@ -213,8 +210,6 @@ docker run -d \
 # JWT_SECRET and ENCRYPTION_KEY are auto-generated and persisted to
 # /opt/mikr/data/.secrets.json on first start. To use your own values,
 # pass: -e JWT_SECRET=$(openssl rand -hex 48) -e ENCRYPTION_KEY=$(openssl rand -hex 32)
-
-docker exec mikr-manager node scripts/seed.js
 ```
 
 ## Environment Variables
