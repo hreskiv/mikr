@@ -1,164 +1,54 @@
 # MikroTik Manager
 
-Self-hosted web application for managing MikroTik device fleets. Monitor, configure, upgrade, and backup your devices from a single dashboard with real-time WebSocket updates.
+Self-hosted web application for running a fleet of MikroTik routers and switches. Monitor, upgrade, back up and configure them from one place, in a single Docker container on your own server. No account and no telemetry: your fleet data stays with you.
 
 [![Version](https://img.shields.io/badge/version-1.111.0-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
 
-## Screenshots
-
 <p align="center">
-  <img src="screenshots/screenshot.png" alt="Dashboard — device status grouped by site" width="100%">
+  <img src="screenshots/screenshot.png" alt="Dashboard: device status grouped by site" width="100%">
 </p>
 
 <details>
 <summary>More screenshots</summary>
 
 <p align="center">
-  <img src="screenshots/screenshot-device-detail.png" alt="Device detail — metric cards, PoE budget, port map with VLANs and SFP cages" width="100%">
+  <img src="screenshots/screenshot-device-detail.png" alt="Device page: metric cards, PoE budget, port map with VLANs and SFP cages" width="100%">
 </p>
 
 <p align="center">
-  <img src="screenshots/screenshot-upgrades.png" alt="Upgrades — RouterOS and firmware versions per device, with release channel and status" width="100%">
+  <img src="screenshots/screenshot-upgrades.png" alt="Upgrades: RouterOS and firmware versions per device, with release channel and status" width="100%">
 </p>
 
 <p align="center">
-  <img src="screenshots/screenshot-backups.png" alt="Backups — side-by-side config diff between two dates" width="100%">
+  <img src="screenshots/screenshot-backups.png" alt="Backups: side-by-side config diff between two dates" width="100%">
 </p>
 
 <p align="center">
-  <img src="screenshots/screenshot-logs.png" alt="Logs — live syslog stream with site, device, time, severity and topic filters" width="100%">
+  <img src="screenshots/screenshot-logs.png" alt="Logs: live syslog stream with site, device, time, severity and topic filters" width="100%">
 </p>
 
 </details>
 
-## Features
+## What it does
 
-### Monitoring
-- **Real-time dashboard** — device status cards with WebSocket live updates (60s polling, configurable per device). **(v1.89.1+)** Each browser tab is titled with the page it shows — or the device's name on a device page — so several open tabs can be told apart. **(v1.95.0+)** A device that is not answering shows **Last seen**, with the date, on its card and on its page — the last poll that returned data, as against the **Last Check** attempt beside it
-- **Metric & SFP optical graphs (v1.42.0+, CPU/memory v1.53.1+)** — per-device history charts for **CPU load**, **memory usage**, voltage, temperature, fan speed and any other `/system/health` sensor a model exposes (standalone card, auto-scaled axis, 1h/6h/24h/7d/30d). CPU and memory ride along on the regular poll, so they cost no extra device I/O and are graphed on **every** transport, SNMP-polled devices included. Fibre ports also get **SFP optical** graphs — Rx/Tx power (dBm), module temperature and supply voltage — via a Traffic/Optical switch on the traffic card. Sampled every 5 minutes, kept 90 days by default (`METRICS_RETENTION_DAYS`, adjustable in Settings); useful even without an SNMP monitoring system. Works for offline devices, and on models with no sensors at all. **(v1.80.0+)** Charts plot against real time and break the line where sampling stopped, so a gap is drawn as a gap rather than as a normal step; mikr also reports devices whose history has holes while they were up
-- **Metric threshold alerts (v1.58.0+)** — fire a webhook when a device's **CPU load**, **memory usage** or **temperature** crosses a threshold, and an optional recovery webhook when it drops back below. Thresholds set globally in **Settings → Metric alerts** (CPU/memory default 90%, temperature off by default) or overridden per device (`0` disables a metric for that device). An alert only fires after the value stays over the limit for a few consecutive samples (default 3), so brief spikes stay quiet
-- **SNMP monitoring** — lightweight SNMPv2c polling (CPU, memory, uptime, temperature, voltage). Sensors are read from the named health table as well as the scalar OIDs (v1.67.1+), so boards that publish only the former — most of the ax generation — report the same temperature over SNMP as over SSH. **(v1.88.0+)** A device added by a name that has only an IPv6 address is polled over IPv6; a name that also has an IPv4 address keeps using IPv4
-- **Three connection methods** — SSH, REST API, or SNMP-only per device
-- **SNMP as supplementary** — SSH/REST devices can also use SNMP for faster status checks
-- **SNMP-first monitoring (v1.46.0+)** — optionally poll routine status **and traffic** over SNMP (IF-MIB 64-bit counters), opening SSH/REST only on demand for actions and detail tabs — keeps long-lived SSH sessions off routers that don't like them. Global toggle or per-device (Default / SNMP / SSH); off by default, never forced
-- **Interface traffic history** — one-minute samples per interface, 7 days by default; per device you can limit it to chosen interfaces, which matters on routers with hundreds of VLANs, and the storage takes about a sixth of what it used to (v1.97.0+). Upgrading a large install keeps the old history and converts it in the background, with a dashboard banner to delete the old copy afterwards (v1.97.2+)
+- **Monitoring** over SSH, REST or SNMP, with metric, traffic and SFP history and alerts on thresholds
+- **RouterOS and firmware upgrades** across the fleet, with a queue, schedules, release notes and a safety stop
+- **Config backups** on a schedule, with a diff between any two dates
+- **Logs** from a built-in syslog receiver, with filters, export and alerts
+- **Device pages** for interfaces, VLANs, PoE, Wi-Fi, LTE, tunnels, routing and the bridge tables
+- **Topology map** built from neighbour discovery
+- **Security**: RouterOS CVE matching, vendor patch tracking, auto-block of repeated failed logins
+- **Integrations**: webhooks, Prometheus, Zabbix, and a read-only MCP endpoint
+- **Access control**: four roles, per-site scope, TOTP and passkeys
 
-### Device Management
-- **Site grouping** — organize devices by physical location; search sites by name, location or description (v1.63.0+)
-- **Duplicate a device (v1.63.0+)** — clone an existing device from its page: give the copy a name and a host, everything else is inherited (credentials, site, tags, connection method, ports, poll interval). The copy is made server-side, so the stored credentials come with it
-- **Read-only RouterOS account warning (v1.64.0+)** — your role here and the rights of the RouterOS user stored for a device are independent. A device whose RouterOS account has no `write` policy carries a `read-only` badge on its card and a note on its page naming the account, so you learn about it when adding the device rather than when an upgrade or a backup is rejected. Test Connection reports it too
-- **Serial number and software ID (v1.90.0+)** — the device page shows the board's serial number and its software ID, or system ID on a CHR, once the device has reported them. The API returns both, so another tool can match a device on its hardware after its name or address has changed. If a different board answers at a device's address, the device shows **Other device** and nothing is written or sent to it until you fix the address or accept the new serial (v1.96.0+)
-- **Device tags** — assign tags with autocomplete, filter by multiple tags (Shift+click)
-- **Device notes (v1.90.1+)** — free text per device, shown on the device page and matched by the search on the Devices page
-- **Site filter (v1.86.0+)** — a picker beside the search box on the Devices page narrows it to one site, alongside the search, status and tag filters; devices belonging to no site are selectable as their own entry. The chosen site stays selected when you go back from a device (v1.98.0+)
-- **Bulk editing** — select multiple devices, change connection parameters in one action
-- **Enable/disable** — disabled devices skip monitoring, dimmed in UI
-- **Import from scan** — discover and add devices from network scan results. Devices already added are recognised by address, DNS name or serial number, and Add skips duplicates (v1.96.0+). A known device found by serial at a new address gets an **Update address** button that moves its entry there (v1.97.0+)
-- **Export / import between instances (v1.45.0+)** — export selected devices (by site or individually) to a passphrase-encrypted `.mikrbundle` and import them into another mikr instance, credentials included; ideal for seeding demo/staging from production
-- **Static DNS from one place (v1.106.0+)** — keep static DNS records (A, AAAA, CNAME) in mikr for the whole fleet, one site or one device; a router gets all three, the narrowest one winning for a name. Each device's DNS tab lists the router's own entries and can import them into mikr. Switch sync on for a site or a device and mikr keeps those routers in line, on a schedule or on demand, with a preview before the first pass and a history of every change. A router entry with the same name and type as a record is taken over, its old value kept in the history; other local entries and dynamic ones are left alone. **Replication from a router (v1.107.0+)**: keep DNS on one router and let mikr copy it to other routers or whole sites on a schedule, all static RouterOS types, with filters by type, domain and comment, a preview, and add-and-update or mirror mode; the source is only ever read
+Managed devices need RouterOS 7. RouterOS 6 is not supported.
 
-### Operations
-- **Bulk CLI commands** — execute on multiple devices with live WebSocket output. **(v1.88.0+)** A safety stop holds the devices not yet reached once a set number have failed, and can wait after each device to confirm it still answers, so a command that cuts a router off stops there; command templates run and deploy under the same limits. Set in Settings → Safety stop or for a single run, off by default
-- **Run-as credential override** — optionally run a bulk command under your own RouterOS login for that one execution; credentials are never stored or logged
-- **Tag-based target selection** — toggle all devices carrying a tag on/off with one click, alongside Select All/Online and manual picking. **(v1.88.0+)** One filter serves every device picker — the Upgrades table, the upgrade queue, the schedule picker, Mass Commands and template runs: plain words, or `name:`, `host:`, `site:`, `model:`, `ros:`, `fw:`, `channel:`, `tag:` and `status:behind` / `fw-behind` / `current` / `unchecked` / `online` / `offline`, combined, as regular expressions
-- **RouterOS upgrades** — check for updates + upgrade with real-time progress. **(v1.100.0+)** Between checks the table follows the device's update channel, so a newly published release shows as *Available* without running *Check for Updates* again. **(v1.99.0+)** A site picker on the Upgrades table, and the devices you sent are unticked once the upgrade starts. **(v1.72.0+)** Read the release notes for a version before installing it — the version badges on the Upgrades page and "What's new" on a device page open that version's RouterOS changelog, grouped by package, with anything MikroTik flagged and any CVE numbers first. Full Upgrade (RouterOS + firmware) is offered on any pending RouterOS update, so both take one trip rather than two. **(v1.88.0+)** A safety stop ends a mass upgrade — from the table, the queue or a schedule — after a set number or share of devices fail, holds the rest, and pauses scheduled upgrades until you press *Resume*; off by default. **(v1.89.0+)** The share is taken of every device in the run, not of those tried so far, so 1% of a 1,000-device run stops at the tenth failure wherever it falls. **(v1.91.0+)** *Change channel…* moves the selected devices to stable, long-term, testing or development after a confirmation that lists each device's current and new channel, and *Previous channel* takes each one back; a device already newer than what its channel offers is skipped by every upgrade path, never rolled back
-- **Sequential upgrade queue** — one device at a time, in an order you control, with PoE-aware ordering so a switch is upgraded after the devices it powers. **(v1.81.0+)** *Add all needing update* fills the queue in one press with every online device that is behind, by the upgrade type selected, instead of picking a hundred devices by hand; devices that have never run an update check are left out and counted, not silently skipped. **(v1.82.0+)** *Schedule…* puts the devices you have selected in the table on a schedule for a later time, so a maintenance window is set from the same filtered list you were already looking at, rather than by finding each device again in the Schedule tab's picker. **(v1.86.0+)** A saved queue preset can be given its own run time under *Manage…*: at that time the queue runs exactly as you saved it, in your order, once — devices deleted or disabled in the meantime are skipped and the rest keep their places. **(v1.88.0+)** A schedule — per device, from *Schedule…* or on a preset — can be pinned to the RouterOS version on offer when it was set: if a newer release has appeared by run time, that device is held and the log names both versions, rather than installing a release nobody reviewed. The queue takes a device dropped anywhere on the list, and *Add all shown* queues whatever the filter leaves
-- **Local package repository (v1.105.0+)** — under Upgrades → Repository, pick one RouterOS device as the fleet's local package server, on a disk or its built-in flash. mikr works out which architectures, channels and extra packages the fleet needs, has the server download the missing files from download.mikrotik.com, keeps the newest versions you choose and removes older ones; other devices fetch from it with RouterOS's own Local Update. Sync by hand or automatically on a new release
-- **Active Tasks tray** — running upgrades stay visible from any page and survive a reload; each task keeps its own log (v1.54.0+)
-- **Task History (v1.100.0+)** — past upgrades, upgrade queues, update checks, channel changes, config exports, scheduled backups and network scans, with each device's result and the step where a failed one stopped; filters by type, status and device, scoped to the devices each user can see
-- **Firmware upgrades** — write firmware + automatic reboot
-- **Config backup & export** — save device configurations to database. **(v1.55.0+)** Every export is verified complete before it is stored, and backups taken earlier are checked on upgrade — any that do not hold a whole config are marked **incomplete** so they are never mistaken for a usable restore point
-- **Side-by-side diff** — compare any two backups visually
-- **Bulk backup download (v1.76.0+)** — download the newest backup of every device you can see as one `.zip`, laid out `<site>/<device>_<date>.rsc`, instead of one config at a time. Pick the whole fleet or a single site; it follows site scope, so a scoped admin gets exactly their sites
-- **Fleet backup health (v1.69.0+)** — the Backups page opens with how many devices are covered and what is wrong with the rest, split into no backup, incomplete latest export, overdue schedule (two consecutive missed runs, so a single offline run raises nothing) and no schedule at all. Click a count for the devices behind it and back one up or give it a schedule from there. Disabled and SNMP-only devices are left out, and nothing is asked of a device to produce it
-- **Backup scheduling** — automated exports with time-of-day selection and flexible intervals (2h to 7d)
-- **Site-wide backup schedules (v1.41.0+)** — set one schedule per site; every device in the site inherits it and devices added later are included automatically. Per-device overrides are kept; opt a new device out from the Add Device form
-- **Global default backup policy (v1.63.0+)** — Settings → Default backup policy sets a fallback for sites that have no schedule of their own, so a newly created site is covered without opening the Backups page. A site schedule overrides it, and a per-device schedule set by hand overrides both. Off by default
-
-### Logging & Observability
-- **Built-in syslog receiver (UDP + TCP)** — the Manager ships both UDP and TCP listeners on port `5514` that ingest MikroTik syslog messages, persist them to SQLite, and stream live to the UI over WebSocket. TCP is useful when UDP is blocked by firewalls or when you want guaranteed delivery — RouterOS 7.x supports `Remote Log Protocol: TCP` natively.
-- **Native RouterOS format** — topics and messages appear exactly as in `/log print` (works out of the box with `remote-log-format=default`; also accepts `<PRI>`-prefixed and `bsd-syslog=yes` RFC3164 forms)
-- **Unified Logs page** — all devices in one stream with colored severity stripe, filters (device, severity, topic, text search), time range selector (`All time` / `Last 1h` / `6h` / `24h` / `7d`), **Load older** pagination, pause and auto-scroll; **Export (v1.93.0+)** of whatever the filter shows, as CSV or plain text, up to the newest 100,000 entries. **(v1.95.0+)** The live stream obeys every filter the page does, site and time range included; hovering a line names the router it came from, and a search box narrows the device list on large installs
-- **Log alerts (v1.102.0+)** — under Logs → Alerts, set rules on incoming syslog lines (text or regex, topics, minimum severity; all devices, a site, a tag or one device; how many lines in how many minutes) and get a `log-alert` webhook when one matches. Each rule has a quiet period, and a rule can be tested against the last 24 hours before it is saved. Admin only
-- **Per-device Logs tab** — focused view on the device detail page for troubleshooting a specific router
-- **Multi-IP device correlation** — logs are matched to the right device by **any** interface IP (collected each monitor poll), so the syslog source IP doesn't need to equal the management IP and `src-address=` pinning is optional. A device added by a DDNS name (IP/Cloud or third-party) has that name resolved and its address matched too (v1.85.0+); an address two devices resolve to is left unattributed rather than guessed
-- **Per-device retention override** — raise the row cap on chatty core/border routers, lower it on quiet APs, so a log-storm on one device can't evict logs from the rest of the fleet
-- **Setup Guide modal** — one click generates a copy-paste MikroTik CLI snippet and an optional **Command Template** to apply the config to every device at once
-- **On-device syslog + RouterOS `dstnat` (if running mikr inside a MikroTik Container App)** — see the full install guide at [mikr.app/install.html#container](https://mikr.app/install.html#container)
-- **Webhooks** — fire an HTTP notification on device online/offline/not-accessible/rebooted (also a reboot the poll notices on its own, v1.102.0+), upgrades, backups, new RouterOS releases, CVE and vendor-patch alerts, LTE data thresholds, metric thresholds (CPU/memory/temperature) and **BGP sessions going down or resetting** (v1.80.0+), and **coming back up** (v1.99.0+). **ISP links (v1.98.0+)**: mark the interfaces facing your providers with a comment on the router (`ISP1`, `ISP2 LTE`, or `WAN` from v1.109.0) or set them on the device, and get a webhook when a link goes down, comes back or changes its address, backup links included; the device page shows every link's state. **Ping through ISP links (v1.111.0+, off by default)**: the router pings each link's gateway and targets behind it, so a provider dead behind a running interface is reported down, a link that loses packets or lags shows as **Degraded** (**ISP Link Degraded** / **Recovered** webhooks, thresholds per device), and the device page keeps latency, loss, jitter and availability history. **Watched ports (v1.107.0+)**: list the ports that matter on a device and get **Port Down** / **Port Up** when one goes down, is disabled or comes back, with the same hold as offline alerts, over SSH or SNMP. A link marked verified on the topology map that a scan stops confirming, and later confirms again, sends **Verified Link Mismatch** / **Restored** (v1.104.0+). Ready-made **JSON**, **ntfy** and **Discord** formats, optional HMAC-SHA256 signing, and per-event custom message templates; the form groups the events and lists the variables each one carries (v1.107.0+). Every event carries the device's site, so a template can name it with `{{device.siteName}}` (v1.77.0+). A webhook can be **limited to chosen sites and device tags** (v1.78.0+) — leave both empty and it covers the whole fleet; events that name no device, such as a new RouterOS release, are always delivered. **Webhooks follow site scope (v1.94.0+)** — an admin limited to certain sites sees and edits only webhooks whose site list is wholly inside their own, and cannot create a fleet-wide one; unrestricted admins are unaffected
-- **Webhooks to any REST API (v1.52.0+)** — the **Custom** format adds your own headers, body template and HTTP method (POST/GET/PUT), so a webhook can drive an SMS gateway, ticketing system or anything else with a REST endpoint. Write the body your target expects (e.g. `{"to":["+48123456789"],"text":"{{summary}}"}`); placeholders work in the URL too, for APIs that take query parameters. Substituted values are escaped for your `Content-Type`, so quotes in device names or error text can't malform the request. Header values are encrypted at rest like device passwords and are never returned to the browser
-- **Prometheus / Grafana export (v1.59.0+)** — an opt-in `/metrics` endpoint in Prometheus text-exposition format for scraping fleet metrics into a time-series database for long-term graphing. Exposes device up/down, CPU, memory, uptime, temperature, voltage, power, and **per-interface receive/transmit rates** (`mikr_interface_rx_bits_per_second` / `_tx_bits_per_second`) — labelled by device, host, site and interface. Enable and set an optional scrape token under **Settings → Prometheus export** (or `METRICS_ENABLED` / `METRICS_TOKEN`). Reads from the manager's own database, so a scrape adds no load on your routers. InfluxDB users can pull it in via a Telegraf `prometheus` input — see the [Prometheus & Grafana section of the install guide](https://mikr.app/install.html#prometheus); a starter Grafana dashboard is at [grafana-dashboard.json](https://mikr.app/grafana-dashboard.json)
-- **Zabbix template (v1.61.3+, per-sensor discovery v1.61.5+)** — [zabbix-template.yaml](https://mikr.app/zabbix-template.yaml) monitors the manager over its REST API and, through it, **every device it polls** — no SNMP or SSH access to the routers is needed, and no Prometheus or Grafana either. Devices are discovered automatically from the API, so each one arrives with its own items (online, CPU, memory, temperature, voltage, RouterOS version, firmware, last poll) and triggers (offline, thresholds, RouterOS update available, firmware behind, stale data). Fleet-level items cover service health, database size, CVE severities, patch gaps, licence headroom, syslog throughput, blocked attackers and failed tasks. Needs one **viewer** API key from **Settings → API keys**
-- **MCP endpoint for AI assistants (v1.73.0+)** — an opt-in read-only [Model Context Protocol](https://modelcontextprotocol.io) server at `/mcp`, so an assistant can be pointed at the manager and asked what is wrong right now, what versions the fleet runs, which devices are behind on backups, or what one device looks like. Ten tools shaped around those questions rather than around routes, each answering in prose or a small table. Authenticated with the API keys you already issue, and bounded by that key's role and site scope — an assistant sees exactly what its key's owner would. It reads and never writes: nothing in it can upgrade, reboot or change a device. Off by default (Settings → MCP endpoint); while off the path returns 404 to everyone. **Browser-based clients (v1.74.0+)** — claude.ai and anything built the same way have no config file to read a key from, so they sign in over OAuth: a consent screen asks for one of your API keys, and the connection carries that key's role and site scope. It needs an install reachable from the internet over HTTPS (Settings → MCP endpoint → Public URL); on a LAN-only install those endpoints stay 404 and a command-line assistant with an API key works as before
-
-### Network Discovery
-- **IP range scanning** — CIDR, dash ranges, single IP (probes SSH + HTTPS + HTTP; leave a port empty to skip that check, v1.96.0+). Several ranges in one scan, and results kept on the server so a reload does not lose them; **discovery profiles** run a scan on their own every hour to weekly with saved credentials, and a **New Device Discovered** webhook lists boards a profile has not seen before (v1.104.0+)
-- **Neighbor discovery** — MNDP / LLDP / CDP with clickable links to managed devices
-- **MAC→IPv4 cross-reference** — resolves link-local IPv6 neighbors to real addresses
-
-### Visualization
-- **Full interface discovery** — all types: ethernet, SFP, bridge, VLAN, bonding, wireless, WireGuard, EoIP, GRE, PPPoE
-- **Grouped interface view** — Ethernet/Physical, CAPsMAN/WiFi, Bridge/VLAN/Bond, Tunnels/VPN, categorized with chips
-- **Physical port map (redesigned v1.48.0+, glyphs v1.62.0+, VLANs v1.65.0+)** — a compact faceplate: each port is a slot with a link-speed LED bar, an activity light, a live-traffic sparkline and small marks inside the cage for delivered PoE (⚡) and a discovered neighbour (→). Copper and SFP ports are drawn as separate blocks (fibre ports as distinct SFP cages); wide 24/48-port switches scale the whole two-row faceplate to fit the width (no scroll), and full per-port detail — wattage, optical readings, the neighbour's identity — is a hover away on the desktop and a tap away on a phone, where ports are labelled by number so the whole switch fits the screen. Each port also shows its **VLAN role** — access or trunk, with the tagged VLANs and the native VLAN — read from whichever place the model keeps it (bridge VLAN table or switch chip) and presented identically for both. A VLAN picker above the faceplate highlights every port carrying the chosen VLAN, filled where it leaves untagged and outlined where it leaves tagged. On models where enabling bridge VLAN filtering costs the hardware offload, the map says so
-- **VLAN editing (v1.67.0+)** — an Edit mode switch on the Interfaces card, for administrators and operators only and off on every page open, opens a VLAN editor: add the VLANs you need, then give each port a role — **Access** in one VLAN or **Trunk** carrying several, tagged. The panel works out how the hardware wants to be configured: on models that keep their hardware offload with a filtering bridge it writes the bridge VLAN table, and on models that would lose it (QCA switch chips) it configures the switch chip instead, so the traffic stays offloaded — without asking which kind of device you have. A switch with no bridge configured yet is a normal starting point: saving creates the bridge, moves the ports into it, writes the VLAN table and enables filtering last, the one order that does not interrupt traffic partway through. Tick **management** on a VLAN and the device gets its own interface in it, on the bridge. The interface the panel reaches the device through is identified from the device's own IP configuration — including when the address sits on a VLAN interface riding a physical port — and kept out of the change; where that path runs through the bridge itself, the editor refuses to delete that VLAN, to take the bridge out of it, or to leave it reaching no port. Review changes shows the exact RouterOS commands before anything is written, a configuration backup is taken first and a failed backup cancels the change, and the device is given a rollback that fires in three minutes unless the change is confirmed — closing the browser does not stop it. VLAN names are stored on the device as the VLAN row's comment. Ports nobody has configured are left exactly as they are. On a device with several bridges (v1.68.0+) you choose which one you are editing, every port shows the bridge it belongs to and the VLANs it carries — including ports that are in no bridge themselves but feed one through a VLAN interface — and the panel reports which bridge holds the hardware offload where the device says so. A port belonging to another bridge cannot be given a role here, and a bridge whose ports are VLAN interfaces (one bridge per VLAN, the pre-`vlan-filtering` way) is shown read-only: the configuration is displayed in full, but mikr does not write that scheme
-- **PoE indicators** — lightning bolt icon with power, voltage, current in tooltip
-- **PoE budget (v1.71.0+)** — on switches with PoE-out, on desktop and phone, a card showing watts delivered against the watts the model can deliver, and how many ports are actually feeding something. The ceiling comes from a per-model table (RouterOS reports consumption but never a budget): a fixed figure for switches with an internal PSU, the fitted-PSU count for a CRS320, and current limit x measured supply voltage for switches you power yourself. CRS328-24P also shows its three per-group ceilings. Models outside the table show the draw without a bar. **(v1.73.0+)** A device can be told which power supply it runs on — MikroTik's by name, or any other by volts and amps — and the ceiling follows from that: routers with PoE-out are budgeted for the first time (RB5009UPr+S+IN: 76 W on the bundled adapter, 130 W on a bigger one), and a supply too small for the board caps the budget instead of the board's own limit. **(v1.75.0+)** The card also reads the voltage the board reports: below the high-voltage class it says so, because passive PoE-out carries whatever voltage the board is fed and only devices that accept it will start, and if the reported voltage contradicts the supply you selected — a brick swapped without changing the field — the card tells you the two disagree. **(v1.87.0+)** hEX PoE is covered too: it delivers at whatever voltage it is fed, so naming the supply is the only way it can have a ceiling, and until you do the card shows the draw and says so rather than guessing
-- **Bridge tables (v1.101.0+)** — a Bridge tab on any device with a bridge: the host table (FDB), searchable by MAC with or without separators, port or VLAN, and the IGMP/MLD snooping multicast groups with their member ports. Read when the tab opens, never by the background poll
-- **DHCP leases** — view all leases with IP, MAC, hostname, status badges, and expiry time
-- **Wireless clients** — connected clients with signal strength, band, TX/RX rates, uptime, and IP from DHCP (rates and band on the `wifi` package v1.96.0+)
-- **Wi-Fi password change** — set new WPA2/WPA3 passphrases from the Wi-Fi tab for modern RouterOS 7 Wi-Fi (`/interface wifi`, incl. CAPsMAN); profile-aware, write-only (current password never shown), admin-only, audited (v1.49.1+)
-- **Auto-refresh** — DHCP and wireless tables update every 30s while visible, disconnected clients disappear automatically
-- **IPsec tunnels** — configured peers with established/not established state, traffic counters, uptime; grouped as an expandable **Peer → Policies** tree with per-peer established/total policy counts (v1.43.0+)
-- **WireGuard peers** — endpoint, last handshake (color-coded by recency), TX/RX counters, comment and the peer's own name where RouterOS reports one (7.15+, v1.84.0+); **Add client** wizard (v1.50.0+) picks the next free tunnel IP (v4 + v6), generates the keypair, writes the peer and returns a QR + downloadable `.conf` — private key shown once, never stored (admin only)
-- **LTE monitoring** — per-modem signal (RSRP/RSRQ/SINR/RSSI with bars), operator, band/cell info, session uptime, optional cell-tower location (CellMapper / OpenCelliD), and modem firmware upgrade
-- **LTE SMS inbox (v1.44.0+)** — read SMS received by an LTE modem (time, sender, text) under the device LTE tab, with a sender/text filter and unread tracking; messages are stored in mikr so the history survives the modem auto-erasing its own inbox
-- **LTE data-usage counter (v1.47.0+)** — set a monthly data limit (GB) per LTE device and mikr accumulates the LTE transfer for the calendar month, showing a used/limit bar on the LTE tab and firing a webhook at a warning % (default 80%) and at 100% — once each per cycle. Counts LTE interfaces only; the figure is an estimate accumulated from polling (not the carrier balance). Optional per-device Owner phone is carried in the alert payload for SMS bridging via webhooks
-- **BGP / OSPF status (v1.38.0+)** — a Routing tab on devices running BGP or OSPF: live BGP sessions with remote AS, state, uptime and **received prefix count**, plus OSPF neighbors with state, adjacency time and area. Surfaces details RouterOS doesn't expose over SNMP (per-peer prefix counts, OSPF neighbors); auto-refreshes, shown only where the protocol is active
-- **Dual-WAN failover (v1.110.0+)** — on a device's Routing Table, pick two providers and a check target for each, and mikr sets up recursive routes so the router moves to the backup when the primary's internet goes down, even while its gateway still answers. Works with DHCP, PPPoE, LTE and static uplinks; every command is shown before it runs, the router rolls the change back on its own unless you confirm it, and *Remove failover* puts the providers back as they were. **Switch on quality (v1.111.0+)**: optionally the router also moves off a provider that loses packets or lags, over its last minute of tests, using the same thresholds as Degraded, and never drops its last working provider; mikr writes threshold changes to the router on the next poll. Admin only
-- **BGP history graphs (v1.39.0+)** — each BGP peer keeps a 5-minute history of its received prefix count and session up/down state, charted under the BGP table (auto-scaled Y axis, downtime strip, 6h/24h/7d/30d ranges). Click any BGP row to chart that peer. **(v1.80.0+)** Each sample also records the session's uptime, so a peer that dropped and came back between two samples is visible instead of reading as unbroken uptime — and a `bgp-session-down` webhook fires on both a peer going down and a session resetting
-- **IP services** — see all MikroTik services (SSH, API, WWW, Winbox, FTP) as colored pills, toggle enable/disable with safety checks
-- **Firewall rules (v1.92.0+)** — a read-only Firewall tab on each device: Filter, NAT, Mangle and Raw rules in device order, grouped by chain, with per-rule packet and byte counters, disabled/dynamic filters and a text search; warns when FastTrack is on
-- **Route counting** — per-protocol breakdown (static, connected, BGP, OSPF, RIP, etc.)
-- **Network topology map** — per-site map built from MNDP/LLDP neighbour discovery: managed devices as draggable cards (status, model, CPU, IP), physical links styled by speed / bond / wireless, and unknown neighbours as unmanaged nodes, an empty-state that explains why no links were found, and IPs shown on unmanaged nodes resolved from LLDP or, when discovery advertises none, from the ARP tables of your managed devices (ARP fallback v1.60.0+). **(v1.103.0+)** Drawn as a tree from the site's gateway (found from ISP interfaces, the default route or STP, or picked by hand), with ports at both ends of each link, links in STP standby shown apart, foldable branches, lines you can bend, and the same tree as a list on a phone. Links discovery cannot see can be drawn by hand, and wrong ones moved or hidden. Unmanaged devices get a name instead of a MAC (static lease comment, LLDP identity, DHCP host name or port comment), and you can name them and set a type yourself; the names also show in DHCP Leases. **(v1.104.0+)** Named devices are drawn under the port they are on even without LLDP, and their names show in the Wi-Fi, Bridge and IPv6 Neighbors tabs too; links can be marked verified and turn red when a scan no longer confirms them; Port comments writes the connected device's name into each port's comment on the router. **(v1.105.0+)** The side panel lists what the scan sees on your ports but is not on the map, with a Name button that puts it there, and every name given on the site; a virtual machine can be put behind its host. Port comments can override a comment written by hand, port by port. A BGP tab draws the fleet's BGP sessions as one graph across sites, transit routers above and sites below, with each session's state and the prefixes each end receives. **(v1.106.0+)** The BGP graph pans and zooms, routers can be dragged into place, and any router or outside peer can be hidden from it
-- **Phone layout (v1.61.0+)** — a one-column layout built for incident response from a phone, replacing the responsive pass from v1.36.0: bottom tab bar (Devices / Upgrades / Logs / More) instead of the slide-in drawer, device cards with threshold-coloured CPU / memory / temperature bars grouped by site, pull-to-refresh, role-gated swipe-to-reboot, a device page whose tabs are generated from what the device actually reports (with swipe between them) and the same port faceplate the desktop draws, a bottom action bar with a consequence-stating confirm sheet, and a streaming Command output screen shared with the desktop. Landscape is supported; an expired session is re-authenticated over the screen you were on; the live-connection state and the time the readings froze are always visible. **(v1.70.0+)** The device page also carries the metric history the desktop shows — CPU, memory, temperature and every health sensor the board reports, over 1h to 30d, with the tiles doubling as the picker: tap CPU, RAM or Temperature to chart it. Desktop layout unchanged. Topology shows as a tree list on a phone (v1.103.0+)
-- **Installable on a phone (v1.61.0+)** — Add to Home Screen gives mikr its own icon and a full-screen window. Served over HTTPS it also caches the interface itself, so launching it while the manager is unreachable shows the real UI with a clear error rather than a browser page; **nothing from the API is ever cached**, so every reading on screen is live. Over plain HTTP the icon and full-screen window still work — browsers only allow the offline cache on a secure origin
-- **iPhone app** — [mikr.app on the App Store](https://apps.apple.com/app/mikr-app/id6812298652), free: signs in to your own server with the same account and shows the fleet, its issues and every device live, read-only, iOS 26+. Setup: [mikr.app/docs/mobile.html](https://mikr.app/docs/mobile.html)
-
-### Security & Access
-- **HTTPS / TLS** — optional HTTPS server on port 3443; auto-generated self-signed cert or bring your own; HTTP and HTTPS run in parallel; WebSocket (WSS) works automatically over HTTPS
-- **Role-based access** — superadmin / admin / operator / viewer. **Viewer is a full read-only role (v1.99.0+)**: every device tab, the backup list and the command history, without backup contents or command output, which can hold passwords and keys
-- **Per-site access control (v1.33.0+)** — scope any non-superadmin user to specific sites; the role decides what they can do, the assigned sites decide where. Scoped users only see and act on their sites everywhere (dashboard, devices, logs, backups, live status, bulk commands/upgrades), enforced server-side. Superadmin manages users and grants site access; unrestricted users keep full-fleet access. **(v1.40.0+)** Access can be assigned both ways — per user, or per site straight from the Add/Edit Site form (tick which scoped users get the site, instead of editing each user). **(v1.94.0+)** The scope now also covers webhooks, the auto-block lists and the activity log: a scoped admin reads their own sites' entries plus those belonging to no site at all, such as sign-ins. Creating, renaming and deleting **sites** is superadmin or unrestricted-admin work, since granting access to a new site is a superadmin action and a scoped admin would otherwise orphan the site they just made
-- **Own password change (v1.89.0+)** — every user, whatever their role, changes their own password under Settings → Password, with the current password required; other browsers signed in to the account are signed out shortly after. Setting another user's password is superadmin-only
-- **JWT authentication** — access token (15min) + refresh token (7d)
-- **RouterOS CVE alerting** — each device's RouterOS version is matched daily against the public NVD vulnerability feed. Dedicated **Security** page with severity/site filters, a per-device Security Advisories card, a `N CVE` badge on device cards, and a High/Critical dashboard banner. Each entry shows the CVSS score/vector, summary, advisory link, and the version that fixes it. Scoped to RouterOS 7; optional `cve-alert` webhook. Informational only — never blocks upgrades or commands. **(v1.94.0+)** *Refresh feeds* on the Security page fetches the advisories and the vendor changelogs on demand instead of waiting for the daily timer, and reports which of the two actually arrived
-- **Vendor patch-gap detection (v1.51.0+)** — a second, independent security signal that catches what CVE databases structurally cannot. mikr reads MikroTik's own release changelogs for the branches you actually run and flags any device below a release that fixed something security-related, using MikroTik's `!)` marker, any named CVE id, and **any security notice written as free text above the change list (v1.83.0+)** — the 03.09.2026 releases (7.24.2, 7.23.4, 6.49.21) carry theirs exactly that way, with no marker and no CVE anywhere in the file. Kept deliberately separate from the CVE feed, because the two make different claims: a CVE says *"this device is vulnerable"* (NVD supplies an affected range), a patch gap says only *"a security release exists on your branch and you're below it"* — a changelog names the **fix** version, never the **affected** range, so mikr never infers one from the other and never guesses across branches. Security lines are snapshotted on first sight and re-checked daily: when the vendor edits or removes one after publication, mikr keeps the original text and shows the edit. **Security → Vendor patches** tab, device-page card, `security-patch-available` webhook
-- **RouterOS device-mode and flagged devices (v1.83.0+)** — RouterOS inspects its own configuration at startup and, on finding signs of unauthorized access, disables the offending settings and marks itself **flagged**: no bandwidth test, traffic generator or sniffer, and no new scheduler, SOCKS, PPTP, L2TP, IPsec, proxy or SMB entry. MikroTik's guidance is to treat a flagged board as compromised, and the signal otherwise lives only on the device. mikr reads `/system/device-mode/print` hourly and shows it as a banner on the device page, a **flagged** badge on the device card, and the first section of the issues report. The device page also states the mode and the RouterOS versions the board will accept, which is what explains an upgrade the router refuses on its own policy. Read-only by design: changing device-mode needs a button press or a cold reboot at the device, so mikr never writes it
-- **Auto-block / Simple IDS** — detects repeated failed logins from the syslog stream, aggregates them per source IP across the whole fleet, and past a threshold (default 5 / 10 min) blocks the IP by maintaining a `mikr-blocklist` firewall address-list with a native 72h timeout. Per-device opt-in; **Audit mode** (list candidates, block by hand) or **Auto-block** (block at threshold); whitelist (manual CIDRs, IPv4 and IPv6 prefixes alike since v1.94.0, + auto private-range + the manager's own interface addresses). A block is released here when its timeout runs out on the device (v1.94.0+), so the same address is caught again if it comes back. Address-list only — you add one drop rule that references the list; mikr never touches your firewall chains. Candidates / Blocked / Whitelist tabs on the Security page
-- **GeoIP rule generator** — pick countries and generate an idempotent RouterOS firewall script sourced from ipdeny.com: **Blocklist** (drop the selected countries; inbound/outbound, `raw` or `filter`) or **Allowlist** (keep only the selected countries, drop the rest — auto-adds an established/private/always-allow safety block so it can't lock you out); IPv4/IPv6, optional weekly auto-refresh; saved as a Script command template and installed via the existing Deploy flow
-- **Two-factor authentication (TOTP)** — opt-in per user and reachable by every role (v1.85.0+), RFC 6238 compatible with Google Authenticator / Authy / 1Password / Microsoft Authenticator; AES-256-GCM-encrypted secrets; 8 single-use backup codes; admin reset for lost devices
-- **Passkey / WebAuthn / FIDO2 sign-in** — additive second factor alongside TOTP: Touch ID, Face ID, Windows Hello, Apple/Google passkey, YubiKey. Multiple named passkeys per account with last-used info, admin reset, counter-regression check against cloned authenticators. Requires HTTPS on a real domain (WebAuthn spec forbids IP RP IDs) — LAN-IP installs see an explicit "Unavailable" notice rather than silent failure
-- **Encrypted passwords** — AES-256-GCM for stored device credentials
-- **Shared SSH key (v1.108.0+)** — one key for the whole fleet under **Settings → Shared SSH key**, generated by mikr (ed25519) or your own. **Put on devices…** adds it to each chosen device, checks that it logs in and only then switches the device to it; if the check fails, the key is taken off again
-- **Dark / Light theme** — toggle in sidebar, persisted in localStorage
-
-### Configuration
-- **Settings UI for runtime knobs (v1.30.0+)** — admin **Settings → System configuration**: 55 knobs across 18 groups (CVE feed enable/key/interval, activity-log retention, monitor poll cadence and concurrency, traffic and syslog retention, metric alert thresholds, LTE data usage, auto-block / IDS, Prometheus export, the MCP endpoint, the default backup policy, backup and upgrade scheduler intervals, the safety stop for mass upgrades, commands and templates, JWT access/refresh expiry, WebAuthn RP ID / name / origins, log level, default SSH / REST API port for new devices). Edit live in the browser, no `docker-compose` edit or container restart, secrets encrypted at rest with AES-256-GCM. Sticky left subnav, one card per group, "from env" badge on any field locked by an environment variable.
-- **Environment variables always win** — anything you set in `.env` / docker-compose stays the source of truth and renders as read-only in the UI with a "from env" badge. GitOps-friendly: existing compose-first deployments don't change behaviour after the upgrade. Bootstrap values (`PORT`, `HOST`, `JWT_SECRET`, `ENCRYPTION_KEY`, `TLS_*`, `SYSLOG_PORT`) stay env-only by design — they're either consumed before settings are loaded, or moving them would invalidate every stored secret on change.
-- **Optional `.rsc` mirror to the data volume (v1.30.0+, closes [#28](https://github.com/hreskiv/mikr/issues/28))** — toggle in Settings → External export. After each successful backup, also writes the RouterOS script export to `<site>/<device>.rsc` under the `exports` folder in the manager's data directory — `/app/data/exports` in the container, `data/exports` beside your compose file on the host. One file per device, overwritten on each new backup. That is the volume you already mount for the database, so there is no second one to add: point its host side at a separate disk for disaster recovery, point a git checkout at it for a free change-history (commit after each write), or rclone it to a NAS / cloud for 3-2-1 backups. Mikr never deletes from this volume; cleanup is yours (git rm / shell).
-
-## Quick Start
-
-> **Full install guide**, including how to deploy on a **MikroTik Container App** and configure the **RouterOS `dstnat` rule for UDP 5514** (syslog): see [mikr.app/install.html](https://mikr.app/install.html).
+## Quick start
 
 ```bash
-# Pull image
-docker pull ghcr.io/hreskiv/mikr:latest
+mkdir -p /opt/mikr && cd /opt/mikr
 
-# Create project directory
-mkdir -p /opt/mikr/data && cd /opt/mikr
-
-# Create docker-compose.yml
 cat > docker-compose.yml << 'EOF'
 services:
   mikr:
@@ -167,165 +57,27 @@ services:
     restart: unless-stopped
     ports:
       - "3000:3000"
-      - "3443:3443"    # HTTPS (optional, requires TLS_ENABLED=true)
-      - "5514:5514/udp"  # Syslog UDP (optional — omit if not using the Logs page)
-      - "5514:5514/tcp"  # Syslog TCP (optional — useful when UDP is blocked)
+      - "5514:5514/udp"   # syslog, optional
+      - "5514:5514/tcp"   # syslog, optional
     volumes:
       - ./data:/app/data
-    environment:
-      - PORT=3000
-      - HOST=0.0.0.0
-      - STORAGE_ADAPTER=sqlite
-      # JWT_SECRET and ENCRYPTION_KEY are auto-generated on first start and saved
-      # to ./data/.secrets.json (mode 0600). Back up the data/ directory!
-      # Override here if you want to set your own:
-      # - JWT_SECRET=$(openssl rand -hex 48)
-      # - ENCRYPTION_KEY=$(openssl rand -hex 32)
-      # Optional: the first admin's password instead of the default "admin"
-      # - INITIAL_ADMIN_PASSWORD=choose-one
 EOF
 
-# Start (the first start creates the admin user)
 docker compose up -d
 ```
 
-Open `http://<host>:3000`, login: **admin** / **admin**. The first sign-in with the default password asks for a new one before anything else opens. Set `INITIAL_ADMIN_PASSWORD` before the first start to skip the default altogether (v1.97.0+).
+Open `http://<host>:3000` and sign in as **admin** / **admin**. The first sign-in asks for a new password.
 
-> **Production:** Create a dedicated MikroTik user group with only the required policies instead of using `admin` with full access:
-> ```
-> /user/group/add name=manager-group policy=ssh,reboot,read,write,sensitive,rest-api,policy,ftp,test,!local,!telnet,!winbox,!password,!web,!sniff,api,!romon
-> /user/add name=mikr group=manager-group password=YOUR_PASSWORD
-> ```
-> This limits the blast radius if the manager is compromised. `test` lets the router ping, which the ISP link check needs when it is switched on; `ftp` lets mikr copy scripts to the router (the automatic rollback after a VLAN or Dual-WAN change, Dual-WAN, script templates, the local package repository). Without them those features fail on that router.
+The [installation guide](https://mikr.app/docs/installation.html) covers HTTPS, environment variables, IPv6, running on a MikroTik container, updating and going back a version. [Getting started](https://mikr.app/docs/getting-started.html) shows how to set up a dedicated RouterOS account for the manager and add your first devices.
 
-## Without Docker Compose
+## Documentation
 
-```bash
-docker pull ghcr.io/hreskiv/mikr:latest
-mkdir -p /opt/mikr/data
-
-docker run -d \
-  --name mikr-manager \
-  --restart unless-stopped \
-  -p 3000:3000 \
-  -p 5514:5514/udp \
-  -p 5514:5514/tcp \
-  -v /opt/mikr/data:/app/data \
-  -e PORT=3000 \
-  -e HOST=0.0.0.0 \
-  -e STORAGE_ADAPTER=sqlite \
-  ghcr.io/hreskiv/mikr:latest
-# JWT_SECRET and ENCRYPTION_KEY are auto-generated and persisted to
-# /opt/mikr/data/.secrets.json on first start. To use your own values,
-# pass: -e JWT_SECRET=$(openssl rand -hex 48) -e ENCRYPTION_KEY=$(openssl rand -hex 32)
-```
-
-## Environment Variables
-
-All variables below are optional with sensible defaults. **From v1.30.0, most of them are also editable from Admin → Settings → System configuration** without a compose edit or restart — when set as an env var here, they take precedence over the UI value and show as locked with a "from env" badge. Bootstrap values (marked **bootstrap** below) stay env-only.
-
-| Variable | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `JWT_SECRET` | No | auto-generated | Auto-generated on first start, persisted to `data/.secrets.json`. Override by setting env. Generate your own: `openssl rand -hex 48` |
-| `ENCRYPTION_KEY` | No | auto-generated | 64 hex chars (32 bytes). Same auto-gen + persist as `JWT_SECRET`. Generate your own: `openssl rand -hex 32` |
-| `PORT` | No | `3000` | Server port |
-| `HOST` | No | `0.0.0.0` | Bind address |
-| `STORAGE_ADAPTER` | No | `sqlite` | Storage backend |
-| `LOG_LEVEL` | No | `info` | Log level |
-| `MONITOR_INTERVAL_MS` | No | `60000` | Device polling interval (ms) |
-| `MONITOR_CONCURRENCY` | No | `10` | Parallel device checks |
-| `TLS_ENABLED` | No | `false` | Enable HTTPS server |
-| `HTTPS_PORT` | No | `3443` | HTTPS server port |
-| `TLS_CERT_PATH` | No | auto-generated | Path to custom TLS certificate (PEM) |
-| `TLS_KEY_PATH` | No | auto-generated | Path to custom TLS private key (PEM) |
-| `SYSLOG_ENABLED` | No | `true` | Enable the built-in UDP syslog receiver |
-| `SYSLOG_PORT` | No | `5514` | UDP port for the syslog listener |
-| `SYSLOG_TCP_ENABLED` | No | `true` | Enable the built-in TCP syslog receiver (parallel to UDP) |
-| `SYSLOG_TCP_PORT` | No | `5514` | TCP port for the syslog listener (defaults to `SYSLOG_PORT`) |
-| `SYSLOG_RETENTION_DAYS` | No | `7` | Drop log rows older than this many days |
-| `SYSLOG_MAX_ROWS_PER_DEVICE` | No | `10000` | Global per-device row cap (overridable per device in the UI) |
-| `CVE_ENABLED` | No | `true` | Enable RouterOS CVE alerting (daily NVD feed match) |
-| `NVD_API_KEY` | No | _(none)_ | Optional NVD API key — raises the fetch rate limit (not required) |
-| `CVE_CHECK_INTERVAL_MS` | No | `86400000` | How often to refresh the NVD feed (default 24h) |
-| `IDS_ENABLED` | No | `false` | Enable Auto-block / Simple IDS (block source IPs of repeated failed logins; per-device opt-in, tune the rest in Settings) |
-| `EXPORT_RSC_ENABLED` | No | `false` | Mirror the latest `.rsc` export to `<data>/exports/<site>/<device>.rsc` after each backup (v1.30.0+) — the same data volume the database lives on. |
-| `BACKUP_DEFAULTS_ENABLED` | No | `false` | Global default backup policy for sites with no schedule of their own (v1.63.0+). Interval, start time and retention are `BACKUP_DEFAULTS_INTERVAL_MS` / `_START_TIME` / `_RETENTION_COUNT` / `_RETENTION_DAYS`, or set them all in Settings. |
-| `ACTIVITY_LOG_RETENTION_DAYS` | No | `90` | Drop audit log rows older than this many days |
-| `JWT_ACCESS_EXPIRY` | No | `15m` | Access token lifetime (jsonwebtoken duration: `15m`, `1h`, `30s`) |
-| `JWT_REFRESH_EXPIRY` | No | `7d` | Refresh token lifetime |
-| `WEBAUTHN_RP_ID` | No | _(none)_ | Registrable domain for passkey sign-in (e.g. `mikr.example.com`). **Must be a real domain, not an IP.** |
-| `WEBAUTHN_RP_NAME` | No | `MikroTik Manager` | Display name shown by the authenticator during passkey registration |
-| `WEBAUTHN_ORIGINS` | No | _(derived from `WEBAUTHN_RP_ID`)_ | Comma-separated list of allowed origins for passkey ceremonies |
-| `DEFAULT_SSH_PORT` | No | `22` | Pre-filled SSH port for new devices (per-device override always wins) |
-| `DEFAULT_API_PORT` | No | `443` | Pre-filled REST API port for new devices |
-
-**Important:** If you rely on auto-generated secrets, **back up `data/.secrets.json`** alongside the SQLite database. Losing it invalidates all sessions and makes stored device passwords unrecoverable. `ENCRYPTION_KEY` must be exactly 64 hex characters — if changed after devices are added, existing encrypted passwords won't decrypt.
-
-## Connection Methods
-
-> **RouterOS 7 is required on the managed devices.** RouterOS 6 is legacy: it is out of scope, is not tested and is not supported, SNMP included. A 6.x device can still pass Test Connection, because the test only proves that the login works, and then leave its device page empty.
-
-| Capability | SSH | REST API | SNMP |
-|------------|-----|----------|------|
-| Status monitoring | ✓ | ✓ | ✓ |
-| CLI commands | ✓ | ✓ | — |
-| RouterOS upgrades | ✓ | ✓ | — |
-| Config backup | ✓ | ✓ | — |
-| Interface details | ✓ | ✓ | ✓ |
-| Self-signed TLS | N/A | ✓ | N/A |
-| Session overhead | 1 SSH conn | HTTPS per request | UDP per poll |
-
-- **SSH** — non-interactive exec, works on every RouterOS 7 release and needs no service beyond SSH itself
-- **REST API** — available on RouterOS 7.1+, supports HTTPS and HTTP
-- **SNMP** — monitoring only (no commands, upgrades, or backups). Useful for devices where SSH/REST isn't available
-
-Devices can use SSH or REST as primary method, with SNMP as an optional supplementary source for faster status checks. The device detail page detects available methods from actual service data and allows quick switching between them — the SSH / REST / SNMP switch stays available in every state, including SNMP-only and offline devices, so you can always change a device's method back (v1.48.2+).
+Everything is at **[mikr.app/docs](https://mikr.app/docs/)**. How data is stored and what leaves the server is in the [security whitepaper](https://mikr.app/security.html). What's coming next is on the [roadmap](https://mikr.app/roadmap.html).
 
 ## Licensing
 
-All features are available on every tier — the only difference is the device limit.
+Community is free for up to 10 devices. Paid licenses raise the device limit, and every tier has every feature. Prices are on [mikr.app](https://mikr.app/#pricing), terms in the [EULA](https://mikr.app/eula.html).
 
-| | Community | License 30 | License 50 | License Unlimited |
-|---|-----------|-----------|------------|------------------|
-| **Devices** | up to 10 | up to 30 | up to 50 | Unlimited |
-| **Price** | €0 | €99 (one-time) | €149 (one-time) | €399 (one-time) |
-| **Updates** | — | €39/year (optional) | €49/year (optional) | €99/year (optional) |
-| **All features** | ✓ | ✓ | ✓ | ✓ |
+## Feedback
 
-- **Perpetual license** — the software works forever on the purchased version
-- **Update subscription** — grants access to new versions (optional, not required)
-- **Self-hosted** — your data stays on your server, offline license activation
-- No account required, no telemetry, no usage tracking — none of your fleet/device/config data ever leaves the server
-- The only outbound traffic is optional read-only public-feed checks (RouterOS CVE feed from NVD, RouterOS release changelogs and latest version from MikroTik, Manager update from GitHub Releases) — GET-only, carry no data, individually disable-able, and degrade gracefully offline
-
-## Data & Backup
-
-SQLite database stored in `./data/mikr.db`. Persists across container updates.
-
-```bash
-# Backup
-cp data/mikr.db mikr-backup.db
-
-# Restore
-cp mikr-backup.db data/mikr.db
-docker restart mikr-manager
-```
-
-## Management
-
-```bash
-docker compose logs -f       # View logs
-docker compose restart       # Restart
-docker compose down          # Stop
-docker compose up -d         # Start / update
-```
-
-## Tech Stack
-
-- **Backend**: Node.js 26, Express.js, SQLite (better-sqlite3)
-- **Frontend**: Vanilla JS SPA (no framework), CSS3
-- **Real-time**: WebSocket for live status, command output, upgrade progress
-- **Auth**: JWT + bcrypt, role-based (superadmin / admin / operator / viewer) with per-site scoping
-- **MikroTik**: SSH (node-ssh) + REST API (https module) + SNMP (net-snmp)
-- **Encryption**: AES-256-GCM for stored device passwords
-- **Container**: Docker, node:26-alpine (multi-stage build)
+Found a bug: open an [issue](https://github.com/hreskiv/mikr/issues). Questions and ideas: [Discussions](https://github.com/hreskiv/mikr/discussions). Inside the app, **Report a bug** at the bottom of the sidebar sends a report straight to me.
