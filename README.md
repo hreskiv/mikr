@@ -2,22 +2,22 @@
 
 Self-hosted web application for running a fleet of MikroTik routers and switches. Monitor, upgrade, back up and configure them from one place, in a single Docker container on your own server. No account and no telemetry: your fleet data stays with you.
 
-[![Version](https://img.shields.io/badge/version-1.111.0-blue)](https://github.com/hreskiv/mikr/releases)
+[![Version](https://img.shields.io/badge/version-2.0.0-blue)](https://github.com/hreskiv/mikr/releases)
 [![Docker](https://img.shields.io/badge/docker-ghcr.io%2Fhreskiv%2Fmikr-blue)](https://ghcr.io/hreskiv/mikr)
 
 <p align="center">
-  <img src="screenshots/screenshot.png" alt="Dashboard: device status grouped by site" width="100%">
+  <img src="screenshots/screenshot.png" alt="Overview: what needs attention, a tile per site and the device table grouped by site" width="100%">
 </p>
 
 <details>
 <summary>More screenshots</summary>
 
 <p align="center">
-  <img src="screenshots/screenshot-device-detail.png" alt="Device page: metric cards, PoE budget, port map with VLANs and SFP cages" width="100%">
+  <img src="screenshots/screenshot-device-detail.png" alt="Device page: readings and tabs, port map with SFP cages, charts and PoE budget" width="100%">
 </p>
 
 <p align="center">
-  <img src="screenshots/screenshot-upgrades.png" alt="Upgrades: RouterOS and firmware versions per device, with release channel and status" width="100%">
+  <img src="screenshots/screenshot-upgrades.png" alt="Upgrades: RouterOS and firmware versions per device, grouped by site, with release channel and status" width="100%">
 </p>
 
 <p align="center">
